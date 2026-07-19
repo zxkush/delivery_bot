@@ -68,15 +68,17 @@
     ];
 
     let cart = [];
-    const grid = document.getElementById('productGrid');// Отрисовка товаров
+    const grid = document.getElementById('productGrid');
+
+    // Отрисовка товаров
     products.forEach(p => {
         const card = document.createElement('div');
         card.className = 'card';
-        card.innerHTML = 
+        card.innerHTML = `
             <img src="images/${p.img}" alt="${p.name}" onerror="this.style.display='none'">
             <p>${p.name}</p>
             <p class="price">${p.price} руб</p>
-        ;
+        `;
         const btn = document.createElement('button');
         btn.innerText = 'Купить';
         btn.onclick = () => addToCart(p.name, p.price);
@@ -95,12 +97,12 @@
             container.innerHTML = "<p>Корзина пуста</p>";
             document.getElementById('orderBtn').style.display = 'none';
         } else {
-            container.innerHTML = cart.map(item => 
+            container.innerHTML = cart.map(item => `
                 <div class="cart-item">
                     <span>${item.name}</span>
                     <span>${item.price} руб</span>
                 </div>
-            ).join('');
+            `).join('');
             document.getElementById('orderBtn').style.display = 'block';
         }
         document.getElementById('cartModal').style.display = 'block';
