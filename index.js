@@ -1,17 +1,21 @@
 require('dotenv').config();
-const TelegramBot = require('node-telegram-bot-api');
+const { Telegraf, Markup } = require('telegraf');
 
-// Бот берет токен из файла .env автоматически
-const token = process.env.TOKEN;
-const bot = new TelegramBot(token, {polling: true});
-const siteUrl = "https://zxkush.github.io/delivery_bot/";
+// Создаем бота
+const bot = new Telegraf(process.env.TOKEN);
 
-bot.onText(/\/menu/, (msg) => {
-    bot.sendMessage(msg.chat.id, "🍟 Наш ассортимент и цены:", {
-        reply_markup: {
-            inline_keyboard: [[{ text: "Открыть меню", url: siteUrl }]]
-        }
-    });
+// Обработка команды /menu
+bot.command('menu', (ctx) => {
+    ctx.reply('🎂 Наш ассортимент и цены:', Markup.inlineKeyboard([
+        Markup.button.url('Открыть меню', 'https://zxkush.github.io/delivery_bot/')
+    ]));
 });
 
-console.log("Бот запущен!");
+// Запуск бота
+bot.launch().then(() => {
+    console.log("Бот запущен на Telegraf!");
+});
+
+// Чтобы бот корректно выключался при нажатии Ctrl+C
+process.once('SIGINT', () => bot.stop('SIGINT'));
+process.once('SIGTERM', () => bot.stop('SIGTERM'));
