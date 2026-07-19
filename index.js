@@ -1,21 +1,19 @@
 require('dotenv').config();
-const { Telegraf, Markup } = require('telegraf');
+const { Telegraf } = require('telegraf');
 
-// Создаем бота
 const bot = new Telegraf(process.env.TOKEN);
 
-// Обработка команды /menu
+// ЭТА КОМАНДА ОТВЕЧАЕТ НА /start
+bot.start((ctx) => {
+    ctx.reply('Привет! Я твой бот. Напиши /menu, чтобы увидеть ассортимент.');
+});
+
+// ЭТА КОМАНДА ОТВЕЧАЕТ НА /menu
 bot.command('menu', (ctx) => {
-    ctx.reply('🎂 Наш ассортимент и цены:', Markup.inlineKeyboard([
-        Markup.button.url('Открыть меню', 'https://zxkush.github.io/delivery_bot/')
-    ]));
+    ctx.reply('🎂 Наш ассортимент и цены: https://zxkush.github.io/delivery_bot/');
 });
 
 // Запуск бота
 bot.launch().then(() => {
-    console.log("Бот запущен на Telegraf!");
+    console.log("УРА! БОТ ЗАПУЩЕН!");
 });
-
-// Чтобы бот корректно выключался при нажатии Ctrl+C
-process.once('SIGINT', () => bot.stop('SIGINT'));
-process.once('SIGTERM', () => bot.stop('SIGTERM'));
