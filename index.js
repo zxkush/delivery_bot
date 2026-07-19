@@ -1,13 +1,17 @@
-const { Telegraf, Markup } = require('telegraf');
+const TelegramBot = require('node-telegram-bot-api');
 
-// Твой бот
-const bot = new Telegraf('8264274999:AAGqAuQo0CtgAOY3AI4TBvl6z-AFRFxaL34');
+// Вставь сюда свой токен
+const token = '8264274999:AAGqAuQo0CtgAOY3AI4TBvl6z-AFRFxaL34';
 
-bot.start((ctx) => {
-    ctx.reply('Привет! Нажми кнопку ниже:', Markup.inlineKeyboard([
-        Markup.button.url('Открыть доставку 🏪', 'https://yandex.ru')
-    ]));
+const bot = new TelegramBot(token, {polling: true});
+const siteUrl = "https://zxkush.github.io/delivery_bot/";
+
+bot.onText(/\/menu/, (msg) => {
+    bot.sendMessage(msg.chat.id, "🍟 Наш ассортимент и цены:", {
+        reply_markup: {
+            inline_keyboard: [[{ text: "Открыть меню", url: siteUrl }]]
+        }
+    });
 });
 
-bot.launch();
-console.log('Бот запущен!');
+console.log("Бот запущен!");
