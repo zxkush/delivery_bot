@@ -1,8 +1,8 @@
+require('dotenv').config();
 const TelegramBot = require('node-telegram-bot-api');
 
-// Вставь сюда свой токен
-const token = '8264274999:AAGqAuQo0CtgAOY3AI4TBvl6z-AFRFxaL34';
-
+// Бот берет токен из файла .env автоматически
+const token = process.env.TOKEN;
 const bot = new TelegramBot(token, {polling: true});
 const siteUrl = "https://zxkush.github.io/delivery_bot/";
 
