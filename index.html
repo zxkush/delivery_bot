@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мой Магазин</title>
+    <style>
+        /* Применяем Comic Sans */
+        body { 
+            font-family: 'Comic Sans MS', 'Comic Sans', cursive;
+            background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+        }
+
+        /* Анимация появления */
+        .fade-in { animation: fadeIn 1s ease; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 { font-size: 3rem; color: #fff; text-shadow: 2px 2px 4px rgba(0,0,0,0.2); }
+
+        .product { 
+            background: white; 
+            padding: 20px; 
+            margin: 10px; 
+            border-radius: 20px; 
+            width: 80%; 
+            max-width: 300px; 
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+            text-align: center;
+        }
+
+        /* Анимация при наведении */
+        .product:hover { transform: scale(1.05); }
+
+        .delivery { font-weight: bold; margin: 20px; color: #fff; }
+
+        /* Пульсирующая кнопка */
+        .call-btn { 
+            display: inline-block; 
+            padding: 20px 40px; 
+            background: #ff4757; 
+            color: white; 
+            text-decoration: none; 
+            border-radius: 50px; 
+            font-size: 1.5rem; 
+            font-weight: bold;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="fade-in">
+        <h1>Меню</h1>
+
+        <div class="product">Лимонад — 50₽</div>
+        <div class="product">Flash — 90₽</div>
+        <div class="product">Drive — 80₽</div>
+        <div class="product">Кириешки — 20₽</div>
+
+        <p class="delivery">Доставка: 30₽</p>
+
+        <a href="tel:+79625270595" class="call-btn">Позвонить!</a>
+    </div>
+
+</body>
+</html>
