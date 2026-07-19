@@ -3,124 +3,78 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Premium Energy</title>
+    <title>Energy & Drinks Shop</title>
     <style>
-        body { background: #050505; color: #fff; font-family: Arial, sans-serif; margin: 0; padding-bottom: 60px; }
-        header { display: flex; justify-content: space-between; align-items: center; padding: 20px; border-bottom: 1px solid #333; }
-        .cart-btn { background: #ff0000; padding: 10px 15px; border-radius: 8px; cursor: pointer; font-weight: bold; }
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 10px; }
-        .card { background: #1a1a1a; padding: 10px; border-radius: 12px; text-align: center; border: 1px solid #333; }
-        .card img { width: 100%; height: 120px; object-fit: contain; border-radius: 8px; display: block; }
-        .price { color: #ff0000; font-weight: bold; margin: 8px 0; }
-        button { width: 100%; background: #ff0000; color: white; border: none; padding: 12px; border-radius: 5px; cursor: pointer; font-weight: bold; }
-        .modal { display: none; position: fixed; bottom: 0; left: 0; width: 100%; height: 85%; background: #111; border-radius: 20px 20px 0 0; padding: 20px; box-sizing: border-box; overflow-y: auto; z-index: 100; border-top: 2px solid #ff0000; }
-        .success-modal { text-align: center; padding-top: 50px; }
-        .circle { width: 80px; height: 80px; background: #27ae60; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 40px; }
-        #cartItems { margin-bottom: 20px; }
-        .cart-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #333; }
+        :root { --accent: #ff4500; --bg: #121212; }
+        body { font-family: 'Arial', sans-serif; background: var(--bg); color: white; margin: 0; padding: 20px; }
+        h1 { text-align: center; color: var(--accent); text-transform: uppercase; margin-bottom: 30px; }
+        h2 { border-bottom: 2px solid var(--accent); padding-bottom: 10px; margin-top: 40px; color: var(--accent); }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; max-width: 1200px; margin: 0 auto; }
+        .card { background: #1e1e1e; padding: 15px; border-radius: 15px; text-align: center; border: 2px solid #333; transition: 0.3s; }
+        .card:hover { transform: scale(1.05); border-color: var(--accent); }
+        .card img { width: 100%; height: 200px; object-fit: contain; border-radius: 10px; margin-bottom: 10px; }
+        button { background: var(--accent); border: none; padding: 12px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; color: white; }
+        button:hover { background: #ff6a33; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); justify-content: center; align-items: center; opacity: 0; transition: 0.5s; }
+        .modal.active { display: flex; opacity: 1; }
+        .modal-content { background: #222; padding: 30px; border-radius: 20px; text-align: center; border: 2px solid var(--accent); max-width: 300px; }
     </style>
 </head>
 <body>
 
-<header>
-    <h2>ENERGY STORE</h2>
-    <div class="cart-btn" onclick="openCart()">🛒 <span id="cart-count">0</span></div>
-</header>
+    <h1>Energy & Drinks Shop</h1>
 
-<div class="grid" id="productGrid"></div>
+    <h2>Adrenaline</h2>
+    <div class="grid">
+        <div class="card"><img src="images/adren_mix.jpg" alt="Adrenaline"><p>Adrenaline Mix</p><b>150 ₽</b><button onclick="openOrder('Adrenaline Mix')">Купить</button></div>
+        <div class="card"><img src="images/adren_original.jpg" alt="Adrenaline"><p>Adrenaline Original</p><b>150 ₽</b><button onclick="openOrder('Adrenaline Original')">Купить</button></div>
+        <div class="card"><img src="images/adren_zero.jpg" alt="Adrenaline"><p>Adrenaline Zero</p><b>150 ₽</b><button onclick="openOrder('Adrenaline Zero')">Купить</button></div>
+    </div>
 
-<div id="cartModal" class="modal">
-    <span onclick="closeModal('cartModal')" style="float:right; font-size: 28px; cursor: pointer;">✕</span>
-    <h3>Ваша корзина</h3>
-    <div id="cartItems"></div>
-    <button id="orderBtn" onclick="showSuccess()">ОФОРМИТЬ ЗАКАЗ</button>
-</div>
+    <h2>Burn</h2>
+    <div class="grid">
+        <div class="card"><img src="images/burn_apple_kiwi.jpg" alt="Burn"><p>Burn Apple Kiwi</p><b>130 ₽</b><button onclick="openOrder('Burn Apple Kiwi')">Купить</button></div>
+        <div class="card"><img src="images/burn_cherry.jpg" alt="Burn"><p>Burn Cherry</p><b>130 ₽</b><button onclick="openOrder('Burn Cherry')">Купить</button></div>
+        <div class="card"><img src="images/burn_citrus.jpg" alt="Burn"><p>Burn Citrus</p><b>130 ₽</b><button onclick="openOrder('Burn Citrus')">Купить</button></div>
+        <div class="card"><img src="images/burn_original.jpg" alt="Burn"><p>Burn Original</p><b>130 ₽</b><button onclick="openOrder('Burn Original')">Купить</button></div>
+        <div class="card"><img src="images/burn_peach.jpg" alt="Burn"><p>Burn Peach</p><b>130 ₽</b><button onclick="openOrder('Burn Peach')">Купить</button></div>
+        <div class="card"><img src="images/burn_tropical.jpg" alt="Burn"><p>Burn Tropical</p><b>130 ₽</b><button onclick="openOrder('Burn Tropical')">Купить</button></div>
+    </div>
 
-<div id="successModal" class="modal success-modal">
-    <div class="circle">✓</div>
-    <h3>Спасибо за заказ!</h3>
-    <p>Позвоните по номеру:<br><b style="font-size: 1.4em; color: #ff0000;">+7-962-527-05-95</b></p>
-    <p>И продиктуйте ваш заказ</p>
-    <button onclick="resetApp()">НА ГЛАВНУЮ</button>
-</div>
+    <h2>Flash</h2>
+    <div class="grid">
+        <div class="card"><img src="images/flash_berry.jpg" alt="Flash"><p>Flash Berry</p><b>90 ₽</b><button onclick="openOrder('Flash Berry')">Купить</button></div>
+        <div class="card"><img src="images/flash_donut.jpg" alt="Flash"><p>Flash Donut</p><b>90 ₽</b><button onclick="openOrder('Flash Donut')">Купить</button></div>
+        <div class="card"><img src="images/flash_game.jpg" alt="Flash"><p>Flash Game</p><b>90 ₽</b><button onclick="openOrder('Flash Game')">Купить</button></div><div class="card"><img src="images/flash_kiwi.jpg" alt="Flash"><p>Flash Kiwi</p><b>90 ₽</b><button onclick="openOrder('Flash Kiwi')">Купить</button></div>
+        <div class="card"><img src="images/flash_lime.jpg" alt="Flash"><p>Flash Lime</p><b>90 ₽</b><button onclick="openOrder('Flash Lime')">Купить</button></div>
+        <div class="card"><img src="images/flash_orange.jpg" alt="Flash"><p>Flash Orange</p><b>90 ₽</b><button onclick="openOrder('Flash Orange')">Купить</button></div>
+        <div class="card"><img src="images/flash_original.jpg" alt="Flash"><p>Flash Original</p><b>90 ₽</b><button onclick="openOrder('Flash Original')">Купить</button></div>
+        <div class="card"><img src="images/flash_ultra.jpg" alt="Flash"><p>Flash Ultra</p><b>90 ₽</b><button onclick="openOrder('Flash Ultra')">Купить</button></div>
+        <div class="card"><img src="images/flash_zero.jpg" alt="Flash"><p>Flash Zero</p><b>90 ₽</b><button onclick="openOrder('Flash Zero')">Купить</button></div>
+    </div>
 
-<script>
-    const products = [
-        {name: "Adren Mix", img: "adren_mix.jpg", price: 150},
-        {name: "Adren Original", img: "adren_original.jpg", price: 150},
-        {name: "Adren Zero", img: "adren_zero.jpg", price: 150},
-        {name: "Burn Apple Kiwi", img: "burn_apple_kiwi.jpg", price: 130},
-        {name: "Burn Cherry", img: "burn_cherry.jpg", price: 130},
-        {name: "Burn Citrus", img: "burn_citrus.jpg", price: 130},
-        {name: "Burn Original", img: "burn_original.jpg", price: 130},
-        {name: "Burn Peach", img: "burn_peach.jpg", price: 130},
-        {name: "Burn Tropical", img: "burn_tropical.jpg", price: 130},
-        {name: "Flash Berry", img: "flash_berry.jpg", price: 90},
-        {name: "Flash Donut", img: "flash_donut.jpg", price: 90},
-        {name: "Flash Game", img: "flash_game.jpg", price: 90},
-        {name: "Flash Kiwi", img: "flash_kiwi.jpg", price: 90},
-        {name: "Flash Lime", img: "flash_lime.jpg", price: 90},
-        {name: "Flash Orange", img: "flash_orange.jpg", price: 90},
-        {name: "Flash Original", img: "flash_original.jpg", price: 90},
-        {name: "Flash Ultra", img: "flash_ultra.jpg", price: 90},
-        {name: "Flash Zero", img: "flash_zero.jpg", price: 90},
-        {name: "Raush", img: "raush.jpg", price: 100}
-    ];
+    <h2>Лимонады</h2>
+    <div class="grid">
+        <div class="card"><img src="images/raush.jpg" alt="Lemonade"><p>Rausch</p><b>50 ₽</b><button onclick="openOrder('Rausch')">Купить</button></div>
+    </div>
 
-    let cart = [];
-    const grid = document.getElementById('productGrid');
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <h2 id="modalText">Заказ</h2>
+            <p>Позвоните по номеру, чтобы заказать:</p>
+            <h1 style="color:white">+7-962-527-05-95</h1>
+            <button onclick="closeModal()">Закрыть</button>
+        </div>
+    </div>
 
-    // Отрисовка товаров
-    products.forEach(p => {
-        const card = document.createElement('div');
-        card.className = 'card';
-        card.innerHTML = `
-            <img src="images/${p.img}" alt="${p.name}" onerror="this.style.display='none'">
-            <p>${p.name}</p>
-            <p class="price">${p.price} руб</p>
-        `;
-        const btn = document.createElement('button');
-        btn.innerText = 'Купить';
-        btn.onclick = () => addToCart(p.name, p.price);
-        card.appendChild(btn);
-        grid.appendChild(card);
-    });
-
-    function addToCart(name, price) {
-        cart.push({name, price});
-        document.getElementById('cart-count').innerText = cart.length;
-    }
-
-    function openCart() {
-        const container = document.getElementById('cartItems');
-        if (cart.length === 0) {
-            container.innerHTML = "<p>Корзина пуста</p>";
-            document.getElementById('orderBtn').style.display = 'none';
-        } else {
-            container.innerHTML = cart.map(item => `
-                <div class="cart-item">
-                    <span>${item.name}</span>
-                    <span>${item.price} руб</span>
-                </div>
-            `).join('');
-            document.getElementById('orderBtn').style.display = 'block';
+    <script>
+        function openOrder(item) {
+            document.getElementById('modalText').innerText = 'Заказ: ' + item;
+            document.getElementById('modal').classList.add('active');
         }
-        document.getElementById('cartModal').style.display = 'block';
-    }
-
-    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-
-    function showSuccess() {
-        closeModal('cartModal');
-        document.getElementById('successModal').style.display = 'block';
-    }
-
-    function resetApp() {
-        cart = [];
-        document.getElementById('cart-count').innerText = '0';
-        closeModal('successModal');
-    }
-</script>
-
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
+        }
+    </script>
 </body>
 </html>
