@@ -3,81 +3,79 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Мой Магазин</title>
+    <title>Energy & Drinks Shop</title>
     <style>
-        /* Применяем Comic Sans */
-        body { 
-            font-family: 'Comic Sans MS', 'Comic Sans', cursive;
-            background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
-            min-height: 100vh;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            color: #333;
-        }
-
-        /* Анимация появления */
-        .fade-in { animation: fadeIn 1s ease; }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        h1 { font-size: 3rem; color: #fff; text-shadow: 2px 2px 4px rgba(0,0,0,0.2); }
-
-        .product { 
-            background: white; 
-            padding: 20px; 
-            margin: 10px; 
-            border-radius: 20px; 
-            width: 80%; 
-            max-width: 300px; 
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-            transition: transform 0.3s;
-            text-align: center;
-        }
-
-        /* Анимация при наведении */
-        .product:hover { transform: scale(1.05); }
-
-        .delivery { font-weight: bold; margin: 20px; color: #fff; }
-
-        /* Пульсирующая кнопка */
-        .call-btn { 
-            display: inline-block; 
-            padding: 20px 40px; 
-            background: #ff4757; 
-            color: white; 
-            text-decoration: none; 
-            border-radius: 50px; 
-            font-size: 1.5rem; 
-            font-weight: bold;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
-        }
+        :root { --accent: #ff4500; --bg: #121212; }
+        body { font-family: 'Arial', sans-serif; background: var(--bg); color: white; margin: 0; padding: 20px; }
+        h1 { text-align: center; color: var(--accent); text-transform: uppercase; margin-bottom: 30px; }
+        h2 { border-bottom: 2px solid var(--accent); padding-bottom: 10px; margin-top: 40px; color: var(--accent); }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; max-width: 1200px; margin: 0 auto; }
+        .card { background: #1e1e1e; padding: 15px; border-radius: 15px; text-align: center; border: 2px solid #333; transition: 0.3s; }
+        .card:hover { transform: scale(1.05); border-color: var(--accent); }
+        .card img { width: 100%; height: 200px; object-fit: contain; border-radius: 10px; margin-bottom: 10px; }
+        button { background: var(--accent); border: none; padding: 12px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; color: white; }
+        button:hover { background: #ff6a33; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); justify-content: center; align-items: center; opacity: 0; transition: 0.5s; }
+        .modal.active { display: flex; opacity: 1; }
+        .modal-content { background: #222; padding: 30px; border-radius: 20px; text-align: center; border: 2px solid var(--accent); max-width: 300px; }
     </style>
 </head>
 <body>
 
-    <div class="fade-in">
-        <h1>Меню</h1>
+    <h1>Energy & Drinks Shop</h1>
 
-        <div class="product">Лимонад — 50₽</div>
-        <div class="product">Flash — 90₽</div>
-        <div class="product">Drive — 80₽</div>
-        <div class="product">Кириешки — 20₽</div>
-
-        <p class="delivery">Доставка: 30₽</p>
-
-        <a href="tel:+79625270595" class="call-btn">Позвонить!</a>
+    <h2>Adrenaline</h2>
+    <div class="grid">
+        <div class="card"><img src="images/adren_mix.jpg" alt="Adrenaline"><p>Adrenaline Mix</p><b>150 ₽</b><button onclick="openOrder('Adrenaline Mix')">Купить</button></div>
+        <div class="card"><img src="images/adren_original.jpg" alt="Adrenaline"><p>Adrenaline Original</p><b>150 ₽</b><button onclick="openOrder('Adrenaline Original')">Купить</button></div>
+        <div class="card"><img src="images/adren_zero.jpg" alt="Adrenaline"><p>Adrenaline Zero</p><b>150 ₽</b><button onclick="openOrder('Adrenaline Zero')">Купить</button></div>
     </div>
 
+    <h2>Burn</h2>
+    <div class="grid">
+        <div class="card"><img src="images/burn_apple_kiwi.jpg" alt="Burn"><p>Burn Apple Kiwi</p><b>130 ₽</b><button onclick="openOrder('Burn Apple Kiwi')">Купить</button></div>
+        <div class="card"><img src="images/burn_cherry.jpg" alt="Burn"><p>Burn Cherry</p><b>130 ₽</b><button onclick="openOrder('Burn Cherry')">Купить</button></div>
+        <div class="card"><img src="images/burn_citrus.jpg" alt="Burn"><p>Burn Citrus</p><b>130 ₽</b><button onclick="openOrder('Burn Citrus')">Купить</button></div>
+        <div class="card"><img src="images/burn_original.jpg" alt="Burn"><p>Burn Original</p><b>130 ₽</b><button onclick="openOrder('Burn Original')">Купить</button></div>
+        <div class="card"><img src="images/burn_peach.jpg" alt="Burn"><p>Burn Peach</p><b>130 ₽</b><button onclick="openOrder('Burn Peach')">Купить</button></div>
+        <div class="card"><img src="images/burn_tropical.jpg" alt="Burn"><p>Burn Tropical</p><b>130 ₽</b><button onclick="openOrder('Burn Tropical')">Купить</button></div>
+    </div>
+
+    <h2>Flash</h2>
+    <div class="grid">
+        <div class="card"><img src="images/flash_berry.jpg" alt="Flash"><p>Flash Berry</p><b>90 ₽</b><button onclick="openOrder('Flash Berry')">Купить</button></div>
+        <div class="card"><img src="images/flash_donut.jpg" alt="Flash"><p>Flash Donut</p><b>90 ₽</b><button onclick="openOrder('Flash Donut')">Купить</button></div>
+        <div class="card"><img src="images/flash_game.jpg" alt="Flash"><p>Flash Game</p><b>90 ₽</b><button onclick="openOrder('Flash Game')">Купить</button></div>
+<div class="card"><img src="images/flash_kiwi.jpg" alt="Flash"><p>Flash Kiwi</p><b>90 ₽</b><button onclick="openOrder('Flash Kiwi')">Купить</button></div>
+        <div class="card"><img src="images/flash_lime.jpg" alt="Flash"><p>Flash Lime</p><b>90 ₽</b><button onclick="openOrder('Flash Lime')">Купить</button></div>
+        <div class="card"><img src="images/flash_orange.jpg" alt="Flash"><p>Flash Orange</p><b>90 ₽</b><button onclick="openOrder('Flash Orange')">Купить</button></div>
+        <div class="card"><img src="images/flash_original.jpg" alt="Flash"><p>Flash Original</p><b>90 ₽</b><button onclick="openOrder('Flash Original')">Купить</button></div>
+        <div class="card"><img src="images/flash_ultra.jpg" alt="Flash"><p>Flash Ultra</p><b>90 ₽</b><button onclick="openOrder('Flash Ultra')">Купить</button></div>
+        <div class="card"><img src="images/flash_zero.jpg" alt="Flash"><p>Flash Zero</p><b>90 ₽</b><button onclick="openOrder('Flash Zero')">Купить</button></div>
+    </div>
+
+    <h2>Лимонады</h2>
+    <div class="grid">
+        <div class="card"><img src="images/raush.jpg" alt="Lemonade"><p>Rausch</p><b>50 ₽</b><button onclick="openOrder('Rausch')">Купить</button></div>
+    </div>
+
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <h2 id="modalText">Заказ</h2>
+            <p>Позвоните по номеру, чтобы заказать:</p>
+            <h1 style="color:white">+7-962-527-05-95</h1>
+            <button onclick="closeModal()">Закрыть</button>
+        </div>
+    </div>
+
+    <script>
+        function openOrder(item) {
+            document.getElementById('modalText').innerText = 'Заказ: ' + item;
+            document.getElementById('modal').classList.add('active');
+        }
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
+        }
+    </script>
 </body>
 </html>
