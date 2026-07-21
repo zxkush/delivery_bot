@@ -1,10 +1,9 @@
-```html
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ENERGY HUB • Premium iOS Shop</title>
+    <title>NineGo • Delivery Shop</title>
     <style>
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { 
@@ -16,15 +15,23 @@
             overflow-x: hidden; 
         }
 
-        /* HEADER */
+        /* HEADER & WORKING HOURS BANNER */
         header { 
             display: flex; justify-content: space-between; align-items: center; 
-            padding: 16px 20px; border-bottom: 1px solid rgba(255,255,255,0.08);
+            padding: 12px 20px; border-bottom: 1px solid rgba(255,255,255,0.08);
             position: sticky; top: 0; background: rgba(0, 0, 0, 0.85);
             backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
             z-index: 20;
         }
-        h2 { margin: 0; font-size: 20px; letter-spacing: 0.5px; font-weight: 700; }
+        .brand-box { display: flex; flex-direction: column; }
+        h2 { margin: 0; font-size: 18px; letter-spacing: 0.5px; font-weight: 700; color: #fff; }
+        
+        .work-status {
+            font-size: 11px; margin-top: 3px; display: flex; align-items: center; gap: 5px; font-weight: 500;
+        }
+        .status-dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
+        .status-dot.open { background: #30d158; box-shadow: 0 0 8px #30d158; }
+        .status-dot.closed { background: #ff453a; box-shadow: 0 0 8px #ff453a; }
 
         /* CART BUTTON */
         .cart-btn { 
@@ -152,15 +159,37 @@
 
         .total-price { font-size: 20px; font-weight: 700; text-align: right; margin: 20px 0 10px; color: #fff; }
 
-        /* SUCCESS MODAL WITH GREEN CIRCLE */
-        .success-modal { text-align: center; padding-top: 10px; }
-        .circle-check {
-            width: 80px; height: 80px; background: #27ae60; border-radius: 50%;
+        /* SUCCESS & ERROR MODALS */
+        .status-modal { text-align: center; padding-top: 10px; }
+        
+        .circle-icon {
+            width: 80px; height: 80px; border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
             margin: 10px auto 20px; font-size: 40px; color: white;
-            box-shadow: 0 0 30px rgba(39, 174, 96, 0.4);
             animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
         }
+        .circle-icon.check {
+            background: #27ae60;
+            box-shadow: 0 0 30px rgba(39, 174, 96, 0.4);
+        }
+        .circle-icon.cross {
+            background: #ff3b30;
+            box-shadow: 0 0 30px rgba(255, 59, 48, 0.4);
+        }
+
+        /* SVG ANIMATED CROSS */
+        .svg-cross {
+            width: 42px; height: 42px; stroke: white; stroke-width: 4; stroke-linecap: round;
+        }
+        .svg-cross path {
+            stroke-dasharray: 50; stroke-dashoffset: 50;
+            animation: drawCross 0.4s cubic-bezier(0.65, 0, 0.45, 1) 0.15s forwards;
+        }
+        @keyframes drawCross {
+            to { stroke-dashoffset: 0; }
+        }
+
         @keyframes popIn { from { transform: scale(0); } to { transform: scale(1); } }
 
         .order-code-box {
@@ -206,7 +235,13 @@
 </div>
 
 <header>
-    <h2>ENERGY HUB</h2>
+    <div class="brand-box">
+        <h2>NineGo</h2>
+        <div class="work-status" id="headerStatus">
+            <span class="status-dot" id="statusDot"></span>
+            <span id="statusText">Загрузка...</span>
+        </div>
+    </div>
     <div class="cart-btn" onclick="openCart()">🛒 <span id="cart-count">0</span></div>
 </header>
 
@@ -261,17 +296,35 @@
 
         <div class="total-price">Итого: <span id="totalSum" style="color:#ff3b30">0</span> руб</div>
         
-        <button class="order-btn" onclick="showSuccess()">
+        <button class="order-btn" onclick="handleCheckout()">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
-            @wcllcw • Оформить
+            Оформить заказ
         </button>
     </div>
 </div>
 
-<!-- ОКОШКО УСПЕХА ЗАКАЗА С ЗЕЛЕНЫМ КРУГОМ -->
-<div id="successModal" class="modal success-modal">
+<!-- ОКОШКО ОШИБКИ ВНЕ РАБОЧЕГО ВРЕМЕНИ (КРАСНЫЙ КРУГ И КРЕСТИК) -->
+<div id="errorModal" class="modal status-modal">
     <div class="modal-handle"></div>
-    <div class="circle-check">✓</div>
+    <div class="circle-icon cross">
+        <svg class="svg-cross" viewBox="0 0 24 24">
+            <path d="M18 6L6 18M6 6l12 12" />
+        </svg>
+    </div>
+    <h3 style="margin:0; font-size:22px; font-weight:700; color:#ff3b30;">Заказы не принимаются!</h3>
+    
+    <p style="color:#aaa; font-size:14px; margin:15px 0 20px; line-height:1.5;">
+        Наш сервис доставки работает с <b style="color:#fff;">13:00</b> до <b style="color:#fff;">20:00</b>.<br>
+        Пожалуйста, возвращайтесь в рабочее время!
+    </p>
+    
+    <button class="buy-btn" style="background:#2c2c2e; padding:14px;" onclick="closeModal('errorModal')">ПОНЯТНО</button>
+</div>
+
+<!-- ОКОШКО УСПЕХА ЗАКАЗА С ЗЕЛЕНЫМ КРУГОМ -->
+<div id="successModal" class="modal status-modal">
+    <div class="modal-handle"></div>
+    <div class="circle-icon check">✓</div>
     <h3 style="margin:0; font-size:22px; font-weight:700;">Спасибо за заказ!</h3>
     
     <div class="order-code-box">
@@ -324,6 +377,31 @@
     let isPromoApplied = false;
     let toastTimeout, barTimeout;
 
+    // ПРОВЕРКА РАБОЧЕГО ВРЕМЕНИ (13:00 - 20:00)
+    function isWorkingHours() {
+        const now = new Date();
+        const hours = now.getHours();
+        return hours >= 13 && hours < 20;
+    }
+
+    function updateHeaderStatus() {
+        const dot = document.getElementById('statusDot');
+        const text = document.getElementById('statusText');
+        
+        if (isWorkingHours()) {
+            dot.className = 'status-dot open';
+            text.innerText = 'Открыто • 13:00 - 20:00';
+            text.style.color = '#30d158';
+        } else {
+            dot.className = 'status-dot closed';
+            text.innerText = 'Закрыто • Работаем с 13:00';
+            text.style.color = '#ff453a';
+        }
+    }
+
+    // Инициализация при загрузке
+    updateHeaderStatus();
+
     const grid = document.getElementById('productGrid');
 
     // Отрисовка витрины
@@ -332,7 +410,7 @@
         card.className = 'card';
         card.innerHTML = `
             <div class="product-code">${p.code}</div>
-            <img src="images/${p.img}" alt="${p.name}" onerror="this.src='https://via.placeholder.com/150/0d0d0d/ff0000?text=EH'">
+            <img src="images/${p.img}" alt="${p.name}" onerror="this.src='https://via.placeholder.com/150/0d0d0d/ff0000?text=NineGo'">
             <p class="card-title">${p.name}</p>
             <p class="price">${p.price} руб</p>
         `;
@@ -413,7 +491,6 @@
         document.getElementById('totalSum').innerText = itemsSum + deliveryCost;
     }
 
-    // Подсчет количества одинаковых товаров
     function getGroupedCart() {
         const counts = {};
         cart.forEach(item => {
@@ -469,10 +546,23 @@
     function closeAllModals() {
         closeModal('cartModal');
         closeModal('successModal');
+        closeModal('errorModal');
+    }
+
+    // ЛОГИКА ОФОРМЛЕНИЯ ЗАКАЗА С ПРОВЕРКОЙ ВРЕМЕНИ
+    function handleCheckout() {
+        closeModal('cartModal');
+
+        setTimeout(() => {
+            if (isWorkingHours()) {
+                showSuccess();
+            } else {
+                openModal('errorModal');
+            }
+        }, 200);
     }
 
     function showSuccess() {
-        // Формирование красивого кода типа B2(x2)-A1
         const grouped = getGroupedCart();
         const formattedCode = grouped.map(item => {
             const codeUpper = item.code.toUpperCase();
@@ -480,11 +570,7 @@
         }).join('-');
 
         document.getElementById('generatedOrderCode').innerText = formattedCode || "EMPTY";
-
-        closeModal('cartModal');
-        setTimeout(() => {
-            openModal('successModal');
-        }, 200);
+        openModal('successModal');
     }
 
     function resetApp() {
@@ -493,3 +579,8 @@
         closeAllModals();
     }
 </script>
+
+</body>
+</html>
+
+```
