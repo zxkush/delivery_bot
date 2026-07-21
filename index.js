@@ -8,9 +8,13 @@ bot.start((ctx) => {
     ctx.reply('Привет! Я твой бот. Напиши /menu, чтобы увидеть ассортимент.');
 });
 
-// ЭТА КОМАНДА ОТВЕЧАЕТ НА /menu
+// ЭТА КОМАНДА ОТВЕЧАЕТ НА /menu (с текстом под спойлером)
 bot.command('menu', (ctx) => {
-    ctx.reply('🎂 Наш ассортимент и цены: https://zxkush.github.io/delivery_bot/');
+    ctx.reply(
+        '🎂 Наш ассортимент и цены: https://zxkush.github.io/delivery_bot/\n\n' +
+        '🤫 <tg-spoiler>(промокод NineGo даёт бесплатную доставку)</tg-spoiler>',
+        { parse_mode: 'HTML' }
+    );
 });
 
 // Запуск бота
