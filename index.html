@@ -6,6 +6,23 @@
     <title>NineGo • Premium Delivery Shop</title>
     <!-- Telegram WebApp SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <!-- Firebase SDK (Modular) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getFirestore, doc, setDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Глобальная инициализация облачной базы
+        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+        // Если конфиг доступен, инициализируем бэкенд
+        if (Object.keys(firebaseConfig).length > 0) {
+            window.db = getFirestore(initializeApp(firebaseConfig));
+            window.appId = typeof __app_id !== 'undefined' ? __app_id : 'ninego-shop-default';
+            window.isCloudReady = true;
+        } else {
+            window.isCloudReady = false;
+        }
+        window.dispatchEvent(new Event('firebase-ready'));
+    </script>
     <style>
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { 
@@ -53,7 +70,7 @@
         }
         .cart-btn:active { transform: scale(0.92); }
 
-        /* SEARCH & CATEGORIES */
+        /* SEARCH & CATEGories */
         .controls-bar { padding: 12px 14px 4px; display: flex; flex-direction: column; gap: 10px; }
         .search-box { position: relative; width: 100%; }
         .search-input {
@@ -318,7 +335,7 @@
         </div>
     </div>
 
-    <!-- АДМИН-ПАНЕЛЬ С ЗАЩИТОЙ ПИН-КОДОМ (Показывается ТОЛЬКО для @wcllcw) -->
+    <!-- АДМИН-ПАНЕЛЬ С ЗАЩИТОЙ ПИН-КОДОМ 1965 -->
     <div class="admin-section" id="adminPanel" style="display: none;">
         <div class="admin-title">
             <span>👑 Панель Владельца (@wcllcw)</span>
@@ -338,7 +355,7 @@
             <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 12px; margin-bottom: 12px; display: flex; justify-content: space-around; text-align: center;">
                 <div>
                     <div style="font-size: 16px; font-weight: bold; color: #30d158;" id="admTotalRev">0 ₽</div>
-                    <div style="font-size: 10px; color: #aaa;">Касса за сегодня</div>
+                    <div style="font-size: 10px; color: #aaa;">Касса</div>
                 </div>
                 <div>
                     <div style="font-size: 16px; font-weight: bold; color: #0088cc;" id="admTotalCount">0</div>
@@ -358,7 +375,7 @@
                 <button class="stock-btn in" onclick="saveWorkingHours()">Сохранить</button>
             </div>
 
-            <p style="font-size: 11px; font-weight: bold; color: #aaa; margin: 12px 0 4px;">📦 Стоп-лист и Цены товаров:</p>
+            <p style="font-size: 11px; font-weight: bold; color: #aaa; margin: 12px 0 4px;">📦 Полный Стоп-лист и Цены товаров:</p>
             <div id="adminStockList"></div>
 
             <div style="display: flex; justify-content: space-between; align-items: center; margin: 15px 0 8px;">
@@ -453,30 +470,19 @@
     <button class="buy-btn" style="margin-top:15px; background:#2c2c2e; padding:14px;" onclick="resetApp()">НА ГЛАВНУЮ</button>
 </div>
 
-<script>
-    const MASTER_PIN = "1965"; // ВАШ НОВЫЙ ПИН-КОД ВХОДА В АДМИНКУ
+<script type="module">
+    import { doc, setDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-    // TELEGRAM WEBAPP ДЕТЕКЦИЯ
+    const MASTER_PIN = "1965";
+
+    // TELEGRAM WEBAPP
     const tg = window.Telegram?.WebApp;
     if (tg) { tg.ready(); tg.expand(); }
 
-    // Если данные из Telegram не приходят (обычный браузер), ставим стандартного Гостя
     const tgUser = tg?.initDataUnsafe?.user || { first_name: "Гость", username: "guest" };
-    
-    // Проверка: АДМИН ли этот пользователь? (Только если username строго "wcllcw")
     const isOwner = (tgUser.username && tgUser.username.toLowerCase() === 'wcllcw');
 
-    // LOCAL STORAGE (Имитация Бэкенда)
-    let disabledProducts = JSON.parse(localStorage.getItem('ninego_disabled_items')) || [];
-    let isStoreForceClosed = JSON.parse(localStorage.getItem('ninego_manual_close')) || false;
-    let storedOrders = JSON.parse(localStorage.getItem('ninego_incoming_orders')) || [];
-    let userOrderCount = parseInt(localStorage.getItem('ninego_user_orders_count') || '0');
-    let customPrices = JSON.parse(localStorage.getItem('ninego_custom_prices')) || {};
-    let workStartHour = parseInt(localStorage.getItem('ninego_start_hour') || '13');
-    let workEndHour = parseInt(localStorage.getItem('ninego_end_hour') || '20');
-    let isAdminUnlocked = JSON.parse(localStorage.getItem('ninego_admin_unlocked')) || false;
-
-    // БАЗА ТОВАРОВ
+    // ПОЛНЫЙ КАТАЛОГ ВСЕХ ТВОИХ НАПИТКОВ (20 позиций)
     const products = [
         {
             code: "a1", name: "Adren Mix", img: "adren_mix.jpg", price: 150, isZero: false, isEnergy: true, category: "adren",
@@ -514,25 +520,95 @@
             comp: "Вода очищенная, сахар, концентрированный вишневый сок, регулятор кислотности, таурин, кофеин, инозитол, витамины."
         },
         {
+            code: "b3", name: "Burn Citrus", img: "burn_citrus.jpg", price: 130, isZero: false, isEnergy: true, category: "burn",
+            slogan: "🔥 BURN • Сочный Цитрус",
+            desc: "Заряжающий цитрусовый микс из спелого апельсина и грейпфрута.",
+            cal: "45 ккал / 190 кДж", carbs: "11.2 г", caffeine: "30 мг", taurine: "240 мг", vitamins: "B3, B6, B12",
+            comp: "Вода, сахар, апельсиновый сок, лимонная кислота, таурин, кофеин, витамины."
+        },
+        {
+            code: "b4", name: "Burn Original", img: "burn_original.jpg", price: 130, isZero: false, isEnergy: true, category: "burn",
+            slogan: "🔥 BURN • Огонь для ярких ночей",
+            desc: "Классический пламенный Burn с ягодной кислинкой.",
+            cal: "49 ккал / 208 кДж", carbs: "12.2 г", caffeine: "30 мг", taurine: "240 мг", vitamins: "B3, B6, B12",
+            comp: "Вода газированная, сахар, лимонная кислота, таурин, кофеин, витамины."
+        },
+        {
+            code: "b5", name: "Burn Peach", img: "burn_peach.jpg", price: 130, isZero: false, isEnergy: true, category: "burn",
+            slogan: "🔥 BURN • Бархатный Персик",
+            desc: "Бархатистый мягкий вкус тропического персика.",
+            cal: "46 ккал / 195 кДж", carbs: "11.4 г", caffeine: "30 мг", taurine: "240 мг", vitamins: "B3, B6, B12",
+            comp: "Вода, сахар, персиковый сок, лимонная кислота, таурин, кофеин, витамины."
+        },
+        {
+            code: "b6", name: "Burn Tropical", img: "burn_tropical.jpg", price: 130, isZero: false, isEnergy: true, category: "burn",
+            slogan: "🔥 BURN • Экзотический тропик",
+            desc: "Тропический коктейль из манго, ананаса и маракуйи.",
+            cal: "46 ккал / 195 кДж", carbs: "11.6 г", caffeine: "30 мг", taurine: "240 мг", vitamins: "B3, B6, B12",
+            comp: "Вода, сахар, соки тропических фруктов, таурин, лимонная кислота, кофеин, витамины."
+        },
+        {
             code: "c1", name: "Flash Berry", img: "flash_berry.jpg", price: 90, isZero: false, isEnergy: true, category: "flash",
-            slogan: "⚡ FLASH UP • Включай яркие эмоции • Ягодный микс",
-            desc: "Ягодный Flash Up Energy с сочным вкусом дикой малины и земляники.",
+            slogan: "⚡ FLASH UP • Ягодный микс",
+            desc: "Ягодный Flash Up Energy с сочным вкусом дикой малины.",
             cal: "45 ккал / 190 кДж", carbs: "11.3 г", caffeine: "27 мг", taurine: "120 мг", vitamins: "B3, B5, B6, C",
-            comp: "Вода питьевая очищенная, сахар, регулятор кислотности, таурин, кофеин, сок из черной моркови, витамины."
+            comp: "Вода, сахар, лимонная кислота, таурин, кофеин, сок черной моркови, витамины."
+        },
+        {
+            code: "c2", name: "Flash Donut", img: "flash_donut.jpg", price: 90, isZero: false, isEnergy: true, category: "flash",
+            slogan: "⚡ FLASH UP • Пончик и Глазурь",
+            desc: "Лимитированный десертный Flash Up со вкусом пончика.",
+            cal: "46 ккал / 195 кДж", carbs: "11.5 г", caffeine: "27 мг", taurine: "120 мг", vitamins: "B3, B5, B6, C",
+            comp: "Вода, сахар, лимонная кислота, таурин, кофеин, ароматизатор Пончик, витамины."
+        },
+        {
+            code: "c3", name: "Flash Game", img: "flash_game.jpg", price: 90, isZero: false, isEnergy: true, category: "flash",
+            slogan: "⚡ FLASH UP GAME • Гуарана и Лайм",
+            desc: "Геймерский Flash Up со вкусом гуараны и лайма.",
+            cal: "45 ккал / 190 кДж", carbs: "11.2 г", caffeine: "28 мг", taurine: "120 мг", vitamins: "B3, B5, B6, C",
+            comp: "Вода, сахар, лимонная кислота, таурин, экстракт гуараны, кофеин, витамины."
+        },
+        {
+            code: "c4", name: "Flash Kiwi", img: "flash_kiwi.jpg", price: 90, isZero: false, isEnergy: true, category: "flash",
+            slogan: "⚡ FLASH UP • Сочный Киви",
+            desc: "Освежающий кисленький вкус киви.",
+            cal: "44 ккал / 185 кДж", carbs: "11.0 г", caffeine: "27 мг", taurine: "120 мг", vitamins: "B3, B5, B6, C",
+            comp: "Вода, сахар, лимонная кислота, таурин, кофеин, сок киви, витамины."
+        },
+        {
+            code: "c5", name: "Flash Lime", img: "flash_lime.jpg", price: 90, isZero: false, isEnergy: true, category: "flash",
+            slogan: "⚡ FLASH UP • Ледяной Лайм",
+            desc: "Цитрусовый Flash Up со вкусом лайма.",
+            cal: "44 ккал / 185 кДж", carbs: "11.0 г", caffeine: "27 мг", taurine: "120 мг", vitamins: "B3, B5, B6, C",
+            comp: "Вода, сахар, лимонная кислота, таурин, кофеин, сок лайма, витамины."
+        },
+        {
+            code: "c6", name: "Flash Orange", img: "flash_orange.jpg", price: 90, isZero: false, isEnergy: true, category: "flash",
+            slogan: "⚡ FLASH UP • Апельсиновый драйв",
+            desc: "Апельсиновый энергетик со свежим соком.",
+            cal: "45 ккал / 190 кДж", carbs: "11.2 г", caffeine: "27 мг", taurine: "120 мг", vitamins: "B3, B5, B6, C",
+            comp: "Вода, сахар, апельсиновый сок, лимонная кислота, таурин, кофеин, витамины."
         },
         {
             code: "c7", name: "Flash Original", img: "flash_original.jpg", price: 90, isZero: false, isEnergy: true, category: "flash",
-            slogan: "⚡ FLASH UP ENERGY • Твой энергичный ритм дня",
-            desc: "Классический оригинальный Flash Up Energy с узнаваемой бодрящей кислинкой.",
+            slogan: "⚡ FLASH UP ENERGY • Классика",
+            desc: "Оригинальный Flash Up Energy с бодрящей кислинкой.",
             cal: "45 ккал / 190 кДж", carbs: "11.3 г", caffeine: "27 мг", taurine: "120 мг", vitamins: "B3, B5, B6, C",
-            comp: "Вода питьевая очищенная, сахар, лимонная кислота, таурин, кофеин, цитрат натрия, витамины."
+            comp: "Вода, сахар, лимонная кислота, таурин, кофеин, витамины."
+        },
+        {
+            code: "c8", name: "Flash Ultra", img: "flash_ultra.jpg", price: 90, isZero: false, isEnergy: true, category: "flash",
+            slogan: "⚡ FLASH UP ULTRA • Усиленный",
+            desc: "Усиленный Flash Up с гуараной.",
+            cal: "48 ккал / 200 кДж", carbs: "11.8 г", caffeine: "30 мг", taurine: "200 мг", vitamins: "B3, B5, B6, C",
+            comp: "Вода, сахар, лимонная кислота, таурин, кофеин, гуарана, витамины."
         },
         {
             code: "c9", name: "Flash Zero", img: "flash_zero.jpg", price: 90, isZero: true, isEnergy: true, category: "flash",
-            slogan: "🌱 FLASH ZERO • 100% энергии • Без сахара",
+            slogan: "🌱 FLASH ZERO • Без сахара",
             desc: "Flash Up БЕЗ САХАРА И КАЛОРИЙ.",
             cal: "0 ккал / 0 кДж", carbs: "Не содержит углеводов", caffeine: "27 мг", taurine: "120 мг", vitamins: "B3, B5, B6, C",
-            comp: "Вода питьевая очищенная, регуляторы кислотности, таурин, кофеин натуральный, подсластители, витамины."
+            comp: "Вода, лимонная кислота, таурин, кофеин, подсластители, витамины."
         },
         {
             code: "r1", name: "Raush 1.4L", img: "raush.jpg", price: 50, isZero: true, isEnergy: false, category: "lemonade",
@@ -546,29 +622,86 @@
     let cart = [];
     let activeCategory = 'all';
 
-    function getProductPrice(p) { return customPrices[p.code] !== undefined ? customPrices[p.code] : p.price; }
+    // СОСТОЯНИЕ (синхронизируется из базы)
+    let storeState = {
+        disabledProducts: [],
+        isStoreForceClosed: false,
+        storedOrders: [],
+        customPrices: {},
+        workStartHour: 13,
+        workEndHour: 20
+    };
+
+    let isAdminUnlocked = JSON.parse(localStorage.getItem('ninego_admin_unlocked') || 'false');
+    let userOrderCount = parseInt(localStorage.getItem('ninego_user_orders_count') || '0');
+
+    // ОБЛАЧНАЯ СИНХРОНИЗАЦИЯ (Firebase)
+    function initCloudSync() {
+        if (!window.isCloudReady) {
+            // Если Firebase не сконфигурирован в окружении, работаем локально
+            updateStatusUI();
+            renderProducts();
+            initUserData();
+            return;
+        }
+
+        const stateRef = doc(window.db, 'artifacts', window.appId, 'public', 'data', 'store_state');
+        
+        // Слушаем изменения в реальном времени у всех клиентов
+        onSnapshot(stateRef, (docSnap) => {
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                storeState.disabledProducts = data.disabledProducts || [];
+                storeState.isStoreForceClosed = !!data.isStoreForceClosed;
+                storeState.storedOrders = data.storedOrders || [];
+                storeState.customPrices = data.customPrices || {};
+                storeState.workStartHour = data.workStartHour ?? 13;
+                storeState.workEndHour = data.workEndHour ?? 20;
+            } else {
+                saveCloudState(); // создаем первый документ
+            }
+            updateStatusUI();
+            renderProducts();
+            if (isOwner && isAdminUnlocked) renderAdminDashboard();
+        }, (error) => {
+            console.log("Cloud sync error:", error);
+        });
+    }
+
+    async function saveCloudState() {
+        if (!window.isCloudReady) return;
+        try {
+            const stateRef = doc(window.db, 'artifacts', window.appId, 'public', 'data', 'store_state');
+            await setDoc(stateRef, storeState);
+        } catch(e) { console.error(e); }
+    }
+
+    window.addEventListener('firebase-ready', initCloudSync);
+    setTimeout(() => { if (!window.isCloudReady) initCloudSync(); }, 500);
+
+    function getProductPrice(p) { return storeState.customPrices[p.code] !== undefined ? storeState.customPrices[p.code] : p.price; }
 
     function isWorkingHours() {
-        if (isStoreForceClosed) return false;
+        if (storeState.isStoreForceClosed) return false;
         const hours = new Date().getHours();
-        return hours >= workStartHour && hours < workEndHour;
+        return hours >= storeState.workStartHour && hours < storeState.workEndHour;
     }
 
     function updateStatusUI() {
         const dot = document.getElementById('statusDot');
         const text = document.getElementById('statusText');
 
-        if (isStoreForceClosed) {
+        if (storeState.isStoreForceClosed) {
             dot.className = 'status-dot closed';
             text.innerText = 'Закрыто вручную';
             text.style.color = '#ff453a';
         } else if (isWorkingHours()) {
             dot.className = 'status-dot open';
-            text.innerText = `Открыто • ${workStartHour}:00 - ${workEndHour}:00`;
+            text.innerText = `Открыто • ${storeState.workStartHour}:00 - ${storeState.workEndHour}:00`;
             text.style.color = '#30d158';
         } else {
             dot.className = 'status-dot closed';
-            text.innerText = `Закрыто • Работаем с ${workStartHour}:00`;
+            text.innerText = `Закрыто • Работаем с ${storeState.workStartHour}:00`;
             text.style.color = '#ff453a';
         }
     }
@@ -578,7 +711,6 @@
         document.getElementById('userTag').innerText = tgUser.username ? `@${tgUser.username}` : "@guest";
         document.getElementById('userAvatar').innerText = (tgUser.first_name || "G")[0].toUpperCase();
 
-        // Отображение кнопки админа ТОЛЬКО владельцу
         if (isOwner) {
             const btn = document.getElementById('headerProfileBtn');
             btn.classList.add('admin-glow');
@@ -606,7 +738,7 @@
         document.getElementById('userRankText').innerText = rank;
     }
 
-    function verifyAdminPin() {
+    window.verifyAdminPin = function() {
         const input = document.getElementById('adminPinInput').value;
         if (input === MASTER_PIN) {
             isAdminUnlocked = true;
@@ -615,37 +747,37 @@
         } else {
             alert('Неверный PIN-код!');
         }
-    }
+    };
 
-    function lockAdmin() {
+    window.lockAdmin = function() {
         isAdminUnlocked = false;
         localStorage.setItem('ninego_admin_unlocked', JSON.stringify(false));
         initUserData();
-    }
+    };
 
     function renderAdminDashboard() {
         renderAdminStockList();
         renderAdminOrders();
         updateAdminStoreBtn();
 
-        document.getElementById('admStartHour').value = workStartHour;
-        document.getElementById('admEndHour').value = workEndHour;
+        document.getElementById('admStartHour').value = storeState.workStartHour;
+        document.getElementById('admEndHour').value = storeState.workEndHour;
 
-        const totalRev = storedOrders.reduce((sum, o) => sum + (o.totalPrice || 0), 0);
+        const totalRev = storeState.storedOrders.reduce((sum, o) => sum + (o.totalPrice || 0), 0);
         document.getElementById('admTotalRev').innerText = `${totalRev} ₽`;
-        document.getElementById('admTotalCount').innerText = storedOrders.length;
+        document.getElementById('admTotalCount').innerText = storeState.storedOrders.length;
     }
 
-    function toggleStoreManual() {
-        isStoreForceClosed = !isStoreForceClosed;
-        localStorage.setItem('ninego_manual_close', JSON.stringify(isStoreForceClosed));
+    window.toggleStoreManual = function() {
+        storeState.isStoreForceClosed = !storeState.isStoreForceClosed;
+        saveCloudState();
         updateAdminStoreBtn();
         updateStatusUI();
-    }
+    };
 
     function updateAdminStoreBtn() {
         const btn = document.getElementById('storeToggleBtn');
-        if (isStoreForceClosed) {
+        if (storeState.isStoreForceClosed) {
             btn.className = 'admin-toggle-btn closed';
             btn.innerText = '🔴 Магазин ЗАКРЫТ ВРУЧНУЮ (Нажмите чтобы открыть)';
         } else {
@@ -654,39 +786,42 @@
         }
     }
 
-    function saveWorkingHours() {
+    window.saveWorkingHours = function() {
         const start = parseInt(document.getElementById('admStartHour').value);
         const end = parseInt(document.getElementById('admEndHour').value);
         if (!isNaN(start) && !isNaN(end)) {
-            workStartHour = start; workEndHour = end;
-            localStorage.setItem('ninego_start_hour', start);
-            localStorage.setItem('ninego_end_hour', end);
+            storeState.workStartHour = start; 
+            storeState.workEndHour = end;
+            saveCloudState();
             updateStatusUI();
-            alert('Часы работы сохранены!');
+            alert('Часы работы обновлены для всех!');
         }
-    }
+    };
 
-    function updateProductPrice(code, newPrice) {
+    window.updateProductPrice = function(code, newPrice) {
         const val = parseInt(newPrice);
         if (!isNaN(val) && val > 0) {
-            customPrices[code] = val;
-            localStorage.setItem('ninego_custom_prices', JSON.stringify(customPrices));
+            storeState.customPrices[code] = val;
+            saveCloudState();
             renderProducts();
         }
-    }
+    };
 
-    function toggleProductStock(code) {
-        if (disabledProducts.includes(code)) disabledProducts = disabledProducts.filter(c => c !== code);
-        else disabledProducts.push(code);
-        localStorage.setItem('ninego_disabled_items', JSON.stringify(disabledProducts));
+    window.toggleProductStock = function(code) {
+        if (storeState.disabledProducts.includes(code)) {
+            storeState.disabledProducts = storeState.disabledProducts.filter(c => c !== code);
+        } else {
+            storeState.disabledProducts.push(code);
+        }
+        saveCloudState();
         renderAdminStockList();
         renderProducts();
-    }
+    };
 
     function renderAdminStockList() {
         const container = document.getElementById('adminStockList');
         container.innerHTML = products.map(p => {
-            const isDisabled = disabledProducts.includes(p.code);
+            const isDisabled = storeState.disabledProducts.includes(p.code);
             const price = getProductPrice(p);
             return `
                 <div class="stock-item">
@@ -702,27 +837,27 @@
         }).join('');
     }
 
-    function deleteOrder(index) {
-        storedOrders.splice(index, 1);
-        localStorage.setItem('ninego_incoming_orders', JSON.stringify(storedOrders));
+    window.deleteOrder = function(index) {
+        storeState.storedOrders.splice(index, 1);
+        saveCloudState();
         renderAdminDashboard();
-    }
+    };
 
-    function clearAllOrders() {
+    window.clearAllOrders = function() {
         if (confirm('Очистить всю историю заказов?')) {
-            storedOrders = [];
-            localStorage.setItem('ninego_incoming_orders', JSON.stringify([]));
+            storeState.storedOrders = [];
+            saveCloudState();
             renderAdminDashboard();
         }
-    }
+    };
 
     function renderAdminOrders() {
         const container = document.getElementById('adminOrdersList');
-        if (storedOrders.length === 0) {
+        if (storeState.storedOrders.length === 0) {
             container.innerHTML = "<p style='color:#666; font-size:12px;'>Заказов пока нет</p>";
             return;
         }
-        container.innerHTML = storedOrders.map((o, idx) => `
+        container.innerHTML = storeState.storedOrders.map((o, idx) => `
             <div class="order-card">
                 <span class="order-del-btn" onclick="deleteOrder(${idx})">✕</span>
                 <div class="order-code">${o.code}</div>
@@ -734,7 +869,7 @@
         `).join('');
     }
 
-    // КАТАЛОГ
+    // РЕНДЕР КАТАЛОГА
     function renderProducts() {
         const grid = document.getElementById('productGrid');
         grid.innerHTML = '';
@@ -747,7 +882,7 @@
             else if (activeCategory !== 'all') matchesCat = p.category === activeCategory;
             return matchesQuery && matchesCat;
         }).forEach(p => {
-            const isDisabled = disabledProducts.includes(p.code);
+            const isDisabled = storeState.disabledProducts.includes(p.code);
             const currentPrice = getProductPrice(p);
             const card = document.createElement('div');
             card.className = `card ${isDisabled ? 'disabled-item' : ''}`;
@@ -766,14 +901,14 @@
         });
     }
 
-    function selectCategory(cat, el) {
+    window.selectCategory = function(cat, el) {
         activeCategory = cat;
         document.querySelectorAll('.cat-chip').forEach(c => c.classList.remove('active'));
         el.classList.add('active');
         renderProducts();
-    }
+    };
 
-    function filterProducts() { renderProducts(); }
+    window.filterProducts = function() { renderProducts(); };
 
     function openProductDetail(code) {
         const p = products.find(prod => prod.code === code);
@@ -812,7 +947,7 @@
     }
 
     function addToCart(code) {
-        if (disabledProducts.includes(code)) return;
+        if (storeState.disabledProducts.includes(code)) return;
         const product = products.find(p => p.code === code);
         const existing = cart.find(i => i.code === code);
         if (existing) existing.qty += 1;
@@ -822,20 +957,20 @@
         showToast(`«${product.name}» добавлен`);
     }
 
-    function changeQty(code, delta) {
+    window.changeQty = function(code, delta) {
         const item = cart.find(i => i.code === code);
         if (!item) return;
         item.qty += delta;
         if (item.qty <= 0) cart = cart.filter(i => i.code !== code);
         updateCartBadge();
         renderCart();
-    }
+    };
 
     function updateCartBadge() {
         document.getElementById('cart-count').innerText = cart.reduce((a, b) => a + b.qty, 0);
     }
 
-    function handleCheckout() {
+    window.handleCheckout = function() {
         if (!isWorkingHours()) {
             openModal('errorModal');
             return;
@@ -845,7 +980,7 @@
         const codeText = cart.map(i => `${i.code.toUpperCase()}(x${i.qty})`).join('-');
         const totalPrice = cart.reduce((sum, i) => sum + (getProductPrice(i) * i.qty), 0);
 
-        storedOrders.unshift({
+        storeState.storedOrders.unshift({
             code: codeText,
             totalPrice: totalPrice,
             user: tgUser.username ? `@${tgUser.username}` : tgUser.first_name,
@@ -853,7 +988,7 @@
             comment: comment,
             time: new Date().toLocaleTimeString().slice(0,5)
         });
-        localStorage.setItem('ninego_incoming_orders', JSON.stringify(storedOrders));
+        saveCloudState();
 
         userOrderCount += 1;
         localStorage.setItem('ninego_user_orders_count', userOrderCount.toString());
@@ -861,7 +996,7 @@
         document.getElementById('generatedOrderCode').innerText = `${codeText} (${totalPrice}₽)`;
         closeModal('cartModal');
         openModal('successModal');
-    }
+    };
 
     function showToast(text) {
         const toast = document.getElementById('toast');
@@ -870,8 +1005,8 @@
         setTimeout(() => toast.classList.remove('show'), 2000);
     }
 
-    function openProfile() { initUserData(); openModal('profileModal'); }
-    function openCart() { renderCart(); openModal('cartModal'); }
+    window.openProfile = function() { initUserData(); openModal('profileModal'); };
+    window.openCart = function() { renderCart(); openModal('cartModal'); };
     
     function renderCart() {
         const container = document.getElementById('cartItems');
@@ -904,16 +1039,16 @@
     }
 
     function openModal(id) { document.getElementById('overlay').style.display = 'block'; document.getElementById('overlay').classList.add('show'); document.getElementById(id).classList.add('show'); }
-    function closeModal(id) { document.getElementById(id).classList.remove('show'); document.getElementById('overlay').classList.remove('show'); setTimeout(() => document.getElementById('overlay').style.display = 'none', 300); }
-    function closeAllModals() { closeModal('profileModal'); closeModal('cartModal'); closeModal('productDetailModal'); closeModal('successModal'); closeModal('errorModal'); }
+    window.closeModal = function(id) { document.getElementById(id).classList.remove('show'); document.getElementById('overlay').classList.remove('show'); setTimeout(() => document.getElementById('overlay').style.display = 'none', 300); };
+    window.closeAllModals = function() { closeModal('profileModal'); closeModal('cartModal'); closeModal('productDetailModal'); closeModal('successModal'); closeModal('errorModal'); };
 
-    function resetApp() {
+    window.resetApp = function() {
         cart = [];
         document.getElementById('deliveryAddress').value = '';
         document.getElementById('orderComment').value = '';
         updateCartBadge();
         closeAllModals();
-    }
+    };
 
     updateStatusUI();
     renderProducts();
