@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NineGo • Delivery Shop</title>
+    <title>NineGo • Premium Delivery Shop</title>
     <style>
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { 
@@ -11,7 +11,7 @@
             color: #ffffff; 
             font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Arial, sans-serif; 
             margin: 0; 
-            padding-bottom: 80px; 
+            padding-bottom: 90px; 
             overflow-x: hidden; 
         }
 
@@ -43,13 +43,73 @@
         }
         .cart-btn:active { transform: scale(0.92); }
 
+        /* SEARCH AND CATEGORIES FILTER BAR */
+        .controls-bar {
+            padding: 12px 14px 4px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .search-box {
+            position: relative;
+            width: 100%;
+        }
+        .search-input {
+            width: 100%;
+            background: #1c1c1e;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px;
+            padding: 10px 14px 10px 36px;
+            color: #fff;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s ease;
+        }
+        .search-input:focus { border-color: #ff0000; }
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 14px;
+            color: #777;
+        }
+
+        .category-scroll {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+            scrollbar-width: none;
+        }
+        .category-scroll::-webkit-scrollbar { display: none; }
+
+        .cat-chip {
+            background: #1c1c1e;
+            color: #aaa;
+            padding: 6px 14px;
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+            cursor: pointer;
+            border: 1px solid rgba(255,255,255,0.05);
+            transition: all 0.2s ease;
+        }
+        .cat-chip.active {
+            background: #ff0000;
+            color: #fff;
+            border-color: #ff0000;
+            box-shadow: 0 2px 10px rgba(255, 0, 0, 0.3);
+        }
+
         /* PRODUCT GRID */
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; padding: 14px; }
         .card { 
             background: #0d0d0d; padding: 12px; border-radius: 18px; text-align: center; 
             border: 1px solid rgba(255,255,255,0.06); display: flex; flex-direction: column; 
             transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1), border-color 0.3s ease;
-            position: relative; overflow: hidden;
+            position: relative; overflow: hidden; cursor: pointer;
         }
         .card:active { transform: scale(0.96); border-color: rgba(255,0,0,0.5); }
         
@@ -120,12 +180,78 @@
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .close-btn { font-size: 20px; cursor: pointer; color: #777; background: #1f1f1f; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
 
-        /* CART ITEMS */
+        /* PRODUCT DETAIL SHEET */
+        .detail-img { width: 100%; height: 180px; object-fit: contain; margin-bottom: 15px; }
+        .detail-title-box { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px; }
+        .detail-title { font-size: 20px; font-weight: 700; color: #fff; margin: 0; }
+        .detail-price { font-size: 20px; font-weight: 700; color: #ff3b30; }
+        .detail-badge { display: inline-block; background: rgba(255,0,0,0.15); color: #ff453a; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 8px; margin-bottom: 12px; font-family: monospace; }
+        
+        .slogan-box {
+            font-size: 12px; font-style: italic; color: #ff9500; margin-bottom: 12px; font-weight: 600; letter-spacing: 0.3px;
+        }
+
+        .detail-desc { font-size: 14px; color: #ccc; line-height: 1.5; margin-bottom: 16px; }
+
+        /* SUGAR / ZERO BADGES */
+        .sugar-tag {
+            display: inline-block; padding: 6px 12px; border-radius: 10px; font-size: 12px; font-weight: 700; margin-bottom: 15px;
+        }
+        .sugar-tag.zero {
+            background: rgba(48, 209, 88, 0.15); color: #30d158; border: 1px solid rgba(48, 209, 88, 0.3);
+        }
+        .sugar-tag.contains {
+            background: rgba(255, 69, 58, 0.15); color: #ff453a; border: 1px solid rgba(255, 69, 58, 0.3);
+        }
+
+        /* WARNING BOX (18+) */
+        .warning-box {
+            background: rgba(255, 149, 0, 0.1); border: 1px solid rgba(255, 149, 0, 0.3);
+            border-radius: 12px; padding: 10px 12px; font-size: 11px; color: #ff9500;
+            line-height: 1.4; margin-bottom: 16px; font-weight: 500; display: none;
+        }
+
+        /* NUTRITION TABLE */
+        .nutrition-box {
+            background: #1c1c1e; border-radius: 16px; padding: 14px; margin-bottom: 16px;
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+        .nutrition-title { font-size: 13px; font-weight: 700; color: #888; text-transform: uppercase; margin-bottom: 10px; letter-spacing: 0.5px; }
+        .nutrition-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .nutrition-table tr { border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .nutrition-table tr:last-child { border-bottom: none; }
+        .nutrition-table td { padding: 8px 0; color: #ddd; }
+        .nutrition-table td.val { text-align: right; font-weight: 600; color: #fff; }
+
+        .composition-box {
+            background: #18181a; border-radius: 14px; padding: 12px; margin-bottom: 20px;
+            font-size: 12px; color: #aaa; line-height: 1.45; border: 1px dashed rgba(255,255,255,0.1);
+        }
+
+        /* CART ITEMS WITH QUANTITY CONTROLS */
         .cart-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.06); }
+        .cart-item-info { display: flex; flex-direction: column; gap: 2px; }
         .cart-item-title { font-size: 14px; color: #eee; font-weight: 500; }
-        .cart-item-code { font-size: 11px; color: #ff3b30; font-family: monospace; font-weight: bold; margin-left: 6px; }
-        .cart-item-qty { font-size: 12px; color: #aaa; margin-left: 6px; }
-        .cart-item-price { font-size: 14px; color: #ff3b30; font-weight: 600; }
+        .cart-item-code { font-size: 11px; color: #ff3b30; font-family: monospace; font-weight: bold; }
+        
+        .cart-controls { display: flex; align-items: center; gap: 8px; }
+        .qty-btn {
+            background: #2c2c2e; border: none; color: #fff; width: 28px; height: 28px;
+            border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .qty-btn:active { background: #3a3a3c; }
+        .qty-val { font-size: 14px; font-weight: 600; color: #fff; min-width: 18px; text-align: center; }
+
+        .cart-item-price { font-size: 14px; color: #ff3b30; font-weight: 600; min-width: 60px; text-align: right; }
+
+        /* ADDRESS & NOTE FIELDS */
+        .input-group { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+        .address-input {
+            background: #1c1c1e; border: 1px solid rgba(255,255,255,0.1);
+            color: #fff; padding: 12px 14px; border-radius: 12px; font-size: 13px; outline: none;
+        }
+        .address-input:focus { border-color: #0088cc; }
 
         /* DELIVERY SECTION */
         .section-title { font-size: 14px; font-weight: 600; color: #888; margin: 18px 0 8px; text-transform: uppercase; letter-spacing: 0.5px; }
@@ -178,7 +304,6 @@
             box-shadow: 0 0 30px rgba(255, 59, 48, 0.4);
         }
 
-        /* SVG ANIMATED CROSS */
         .svg-cross {
             width: 42px; height: 42px; stroke: white; stroke-width: 4; stroke-linecap: round;
         }
@@ -196,7 +321,7 @@
             background: #1c1c1e; border: 1px dashed #27ae60;
             padding: 14px; border-radius: 12px; margin: 15px 0;
         }
-        .order-code-text { font-size: 20px; font-weight: bold; color: #27ae60; font-family: monospace; letter-spacing: 1px; word-break: break-all; }
+        .order-code-text { font-size: 18px; font-weight: bold; color: #27ae60; font-family: monospace; letter-spacing: 0.5px; word-break: break-all; }
 
         .contact-link {
             display: flex; align-items: center; justify-content: center; gap: 12px;
@@ -245,6 +370,22 @@
     <div class="cart-btn" onclick="openCart()">🛒 <span id="cart-count">0</span></div>
 </header>
 
+<!-- CONTROLS: SEARCH & CATEGORY CHIPS -->
+<div class="controls-bar">
+    <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="searchInput" class="search-input" placeholder="Поиск напитка или вкуса..." oninput="filterProducts()">
+    </div>
+    <div class="category-scroll">
+        <div class="cat-chip active" onclick="selectCategory('all', this)">Все</div>
+        <div class="cat-chip" onclick="selectCategory('flash', this)">⚡ Flash Up</div>
+        <div class="cat-chip" onclick="selectCategory('adren', this)">🔥 Adrenaline</div>
+        <div class="cat-chip" onclick="selectCategory('burn', this)">💥 Burn</div>
+        <div class="cat-chip" onclick="selectCategory('zero', this)">🌱 Без сахара</div>
+        <div class="cat-chip" onclick="selectCategory('lemonade', this)">🥤 Лимонады</div>
+    </div>
+</div>
+
 <div class="grid" id="productGrid"></div>
 
 <!-- Toast Notification -->
@@ -258,6 +399,72 @@
 
 <div class="overlay" id="overlay" onclick="closeAllModals()"></div>
 
+<!-- КАРТОЧКА ТОВАРА -->
+<div id="productDetailModal" class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+        <span class="detail-badge" id="detailCode">CODE</span>
+        <span class="close-btn" onclick="closeModal('productDetailModal')">✕</span>
+    </div>
+    
+    <img id="detailImg" src="" class="detail-img" alt="Товар">
+    
+    <div class="detail-title-box">
+        <h3 class="detail-title" id="detailTitle">Название</h3>
+        <span class="detail-price" id="detailPrice">0 руб</span>
+    </div>
+    
+    <div class="slogan-box" id="detailSlogan">🔥 Слоган бренда</div>
+
+    <div id="detailSugarTag" class="sugar-tag">Информация о сахаре</div>
+
+    <div class="detail-desc" id="detailDesc">Описание товара...</div>
+
+    <!-- Предупреждение (Показывается ТОЛЬКО для энергетиков) -->
+    <div class="warning-box" id="energyWarning">
+        ⚠️ <b>Предупреждение:</b> Не рекомендуется употребление детьми в возрасте до 18 лет, беременными и кормящими женщинами, а также лицами, страдающими повышенной нервной возбудимостью, бессонницей, артериальной гипертензией.
+    </div>
+
+    <div class="nutrition-box">
+        <div class="nutrition-title">Пищевая ценность (на 100 мл)</div>
+        <table class="nutrition-table">
+            <tr>
+                <td>Энергетическая ценность</td>
+                <td class="val" id="nutrCal">0 ккал</td>
+            </tr>
+            <tr>
+                <td>Углеводы (в т.ч. сахара)</td>
+                <td class="val" id="nutrCarbs" style="font-weight: bold;">0 г</td>
+            </tr>
+            <tr>
+                <td>Белки / Жиры</td>
+                <td class="val">0 г / 0 г</td>
+            </tr>
+            <tr>
+                <td>Кофеин</td>
+                <td class="val" id="nutrCaffeine">25–30 мг</td>
+            </tr>
+            <tr>
+                <td>Таурин</td>
+                <td class="val" id="nutrTaurine">100–240 мг</td>
+            </tr>
+            <tr>
+                <td>Витамины</td>
+                <td class="val" id="nutrVitamins">B3, B5, B6, C</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="composition-box">
+        <b style="color:#ddd;">Подробный состав:</b><br>
+        <span id="detailComposition">Состав...</span>
+    </div>
+
+    <button class="buy-btn" style="padding: 16px; font-size: 15px; border-radius: 18px;" id="detailAddBtn">
+        🛒 Добавить в корзину
+    </button>
+</div>
+
 <!-- КОРЗИНА -->
 <div id="cartModal" class="modal">
     <div class="modal-handle"></div>
@@ -269,6 +476,12 @@
     <div id="cartItems"></div>
 
     <div id="cartFooter" style="display:none">
+        <div class="section-title">Адрес и детали доставки</div>
+        <div class="input-group">
+            <input type="text" id="deliveryAddress" class="address-input" placeholder="Адрес (Улица, дом, квартира, подъезд)">
+            <input type="text" id="orderComment" class="address-input" placeholder="Комментарий (по желанию)">
+        </div>
+
         <div class="section-title">Способ доставки</div>
         <div class="delivery-options">
             <div class="delivery-card active" id="delivery-fast" onclick="selectDelivery('fast')">
@@ -303,7 +516,7 @@
     </div>
 </div>
 
-<!-- ОКОШКО ОШИБКИ ВНЕ РАБОЧЕГО ВРЕМЕНИ (КРАСНЫЙ КРУГ И КРЕСТИК) -->
+<!-- ОКОШКО ОШИБКИ ВНЕ РАБОЧЕГО ВРЕМЕНИ -->
 <div id="errorModal" class="modal status-modal">
     <div class="modal-handle"></div>
     <div class="circle-icon cross">
@@ -321,7 +534,7 @@
     <button class="buy-btn" style="background:#2c2c2e; padding:14px;" onclick="closeModal('errorModal')">ПОНЯТНО</button>
 </div>
 
-<!-- ОКОШКО УСПЕХА ЗАКАЗА С ЗЕЛЕНЫМ КРУГОМ -->
+<!-- ОКОШКО УСПЕХА ЗАКАЗА -->
 <div id="successModal" class="modal status-modal">
     <div class="modal-handle"></div>
     <div class="circle-icon check">✓</div>
@@ -350,34 +563,168 @@
 </div>
 
 <script>
+    // AUDIO SYNTHESIZER FOR SOUND EFFECTS
+    function playClickSound() {
+        try {
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(600, ctx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(200, ctx.currentTime + 0.05);
+            gain.gain.setValueAtTime(0.15, ctx.currentTime);
+            gain.gain.linearRampToValueAtTime(0.01, ctx.currentTime + 0.05);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start();
+            osc.stop(ctx.currentTime + 0.05);
+        } catch(e) {}
+    }
+
+    // БАЗА ДАННЫХ
     const products = [
-        {code: "a1", name: "Adren Mix", img: "adren_mix.jpg", price: 150},
-        {code: "a2", name: "Adren Original", img: "adren_original.jpg", price: 150},
-        {code: "a3", name: "Adren Zero", img: "adren_zero.jpg", price: 150},
-        {code: "b1", name: "Burn Apple Kiwi", img: "burn_apple_kiwi.jpg", price: 130},
-        {code: "b2", name: "Burn Cherry", img: "burn_cherry.jpg", price: 130},
-        {code: "b3", name: "Burn Citrus", img: "burn_citrus.jpg", price: 130},
-        {code: "b4", name: "Burn Original", img: "burn_original.jpg", price: 130},
-        {code: "b5", name: "Burn Peach", img: "burn_peach.jpg", price: 130},
-        {code: "b6", name: "Burn Tropical", img: "burn_tropical.jpg", price: 130},
-        {code: "c1", name: "Flash Berry", img: "flash_berry.jpg", price: 90},
-        {code: "c2", name: "Flash Donut", img: "flash_donut.jpg", price: 90},
-        {code: "c3", name: "Flash Game", img: "flash_game.jpg", price: 90},
-        {code: "c4", name: "Flash Kiwi", img: "flash_kiwi.jpg", price: 90},
-        {code: "c5", name: "Flash Lime", img: "flash_lime.jpg", price: 90},
-        {code: "c6", name: "Flash Orange", img: "flash_orange.jpg", price: 90},
-        {code: "c7", name: "Flash Original", img: "flash_original.jpg", price: 90},
-        {code: "c8", name: "Flash Ultra", img: "flash_ultra.jpg", price: 90},
-        {code: "c9", name: "Flash Zero", img: "flash_zero.jpg", price: 90},
-        {code: "r1", name: "Raush", img: "raush.jpg", price: 50}
+        {
+            code: "a1", name: "Adren Mix", img: "adren_mix.jpg", price: 150, isZero: false, isEnergy: true, category: "adren",
+            slogan: "⚡ ADRENALINE RUSH • Абсолютная энергия и концентрированный сок",
+            desc: "Фруктовый микс от Adrenaline Rush с натуральными концентрированными соками спелого яблока и апельсина.",
+            cal: "46 ккал / 195 кДж", carbs: "11.5 г", caffeine: "30 мг", taurine: "240 мг", vitamins: "B3, B5, B6, B12, C",
+            comp: "Подготовленная вода, сахар, сок яблочный и апельсиновый концентрированный, регуляторы кислотности (лимонная кислота, цитрат натрия 3-замещенный), таурин, кофеин натуральный, L-карнитин, витаминный комплекс (ниацин, пантотеновая кислота, B6, B12), экстракт женьшеня, краситель антоцианы."
+        },
+        {
+            code: "a2", name: "Adren Original", img: "adren_original.jpg", price: 150, isZero: false, isEnergy: true, category: "adren",
+            slogan: "⚡ ADRENALINE RUSH • Всегда на пике твоих возможностей",
+            desc: "Легендарный Adrenaline Rush. Классический бодрящий вкус с добавлением натурального экстракта женьшеня.",
+            cal: "45 ккал / 190 кДж", carbs: "11.0 г", caffeine: "30 мг", taurine: "240 мг", vitamins: "B3, B5, B6, B12, C",
+            comp: "Питьевая вода очищенная, сахар, концентрированный яблочный сок, регуляторы кислотности (лимонная кислота, цитрат натрия), таурин, кофеин, L-карнитин, экстракт женьшеня, витамины (ниацин, пантотеновая кислота, B6, B12), ароматизаторы натуральные."
+        },
+        {
+            code: "a3", name: "Adren Zero", img: "adren_zero.jpg", price: 150, isZero: true, isEnergy: true, category: "adren",
+            slogan: "🌱 ADRENALINE ZERO • Чистая сила без капли сахара",
+            desc: "Adrenaline Rush БЕЗ САХАРА.",
+            cal: "0 ккал / 0 кДж", carbs: "Не содержит углеводов", caffeine: "30 мг", taurine: "240 мг", vitamins: "B3, B5, B6, B12, C",
+            comp: "Вода питьевая подготовленная, таурин, регуляторы кислотности (лимонная кислота, цитрат натрия), натуральный кофеин, подсластители (сукралоза, ацесульфам калия), L-карнитин, витамины (ниацин, B6, B12), экстракт женьшеня."
+        },
+        {
+            code: "b1", name: "Burn Apple Kiwi", img: "burn_apple_kiwi.jpg", price: 130, isZero: false, isEnergy: true, category: "burn",
+            slogan: "🔥 BURN • Раскрой силу огня • Яблоко-Киви",
+            desc: "Освежающий яркий вкус зеленого яблока и киви со взрывной кислинкой.",
+            cal: "48 ккал / 203 кДж", carbs: "12.0 г", caffeine: "30 мг", taurine: "240 мг", vitamins: "B3, B6, B12",
+            comp: "Очищенная газированная вода, сахар, регуляторы кислотности (лимонная кислота, цитрат натрия), таурин, глюкуронолактон, кофеин натуральный, инозитол, ароматизаторы, красители (зеленый S, тартразин), консервант (сорбат калия)."
+        },
+        {
+            code: "b2", name: "Burn Cherry", img: "burn_cherry.jpg", price: 130, isZero: false, isEnergy: true, category: "burn",
+            slogan: "🔥 BURN • Раскрой силу огня • Тёмная Вишня",
+            desc: "Насыщенный вишневый энергетик с добавлением натурального вишневого сока.",
+            cal: "47 ккал / 199 кДж", carbs: "11.8 г", caffeine: "30 мг", taurine: "240 мг", vitamins: "B3, B6, B12",
+            comp: "Вода очищенная, сахар, концентрированный вишневый сок, регулятор кислотности (лимонная кислота, цитрат натрия), таурин, кофеин, инозитол, витамины B3, B6, B12, ароматизаторы, консерванты (бензоат натрия)."
+        },
+        {
+            code: "b3", name: "Burn Citrus", img: "burn_citrus.jpg", price: 130, isZero: false, isEnergy: true, category: "burn",
+            slogan: "🔥 BURN • Раскрой силу огня • Сочный Цитрус",
+            desc: "Заряжающий цитрусовый микс из спелого апельсина и дикого грейпфрута.",
+            cal: "45 ккал / 190 кДж", carbs: "11.2 г", caffeine: "30 мг", taurine: "240 мг", vitamins: "B3, B6, B12",
+            comp: "Вода, сахар, апельсиновый сок концентрированный, лимонная кислота, таурин, натуральный кофеин, цитрат натрия, стабилизаторы, бета-каротин."
+        },
+        {
+            code: "b4", name: "Burn Original", img: "burn_original.jpg", price: 130, isZero: false, isEnergy: true, category: "burn",
+            slogan: "🔥 BURN • Твой внутренний огонь для ярких ночей",
+            desc: "Классический пламенный Burn с ягодной кислинкой и энергией огня.",
+            cal: "49 ккал / 208 кДж", carbs: "12.2 г", caffeine: "30 мг", taurine: "240 мг", vitamins: "B3, B6, B12",
+            comp: "Вода газированная, сахар, лимонная кислота, цитрат натрия, таурин, натуральный кофеин, глюкуронолактон, инозитол, краситель антоцианы, витамины B3, B6, B12."
+        },
+        {
+            code: "b5", name: "Burn Peach", img: "burn_peach.jpg", price: 130, isZero: false, isEnergy: true, category: "burn",
+            slogan: "🔥 BURN • Бархатный Персик и Манго",
+            desc: "Бархатистый мягкий вкус сочного тропического персика.",
+            cal: "46 ккал / 195 кДж", carbs: "11.4 г", caffeine: "30 мг", taurine: "240 мг", vitamins: "B3, B6, B12",
+            comp: "Вода, сахар, персиковый сок концентрированный, лимонная кислота, таурин, кофеин, натрия цитрат, ароматизаторы, бета-каротин."
+        },
+        {
+            code: "b6", name: "Burn Tropical", img: "burn_tropical.jpg", price: 130, isZero: false, isEnergy: true, category: "burn",
+            slogan: "🔥 BURN • Экзотический тропический взрыв",
+            desc: "Тропический коктейль из спелого манго, ананаса и маракуйи.",
+            cal: "46 ккал / 195 кДж", carbs: "11.6 г", caffeine: "30 мг", taurine: "240 мг", vitamins: "B3, B6, B12",
+            comp: "Вода, сахар, соки тропических фруктов концентрированные, таурин, лимонная кислота, кофеин, инозитол, витамины B3, B6, B12."
+        },
+        {
+            code: "c1", name: "Flash Berry", img: "flash_berry.jpg", price: 90, isZero: false, isEnergy: true, category: "flash",
+            slogan: "⚡ FLASH UP • Включай яркие эмоции • Ягодный микс",
+            desc: "Ягодный Flash Up Energy с сочным вкусом дикой малины и земляники.",
+            cal: "45 ккал / 190 кДж", carbs: "11.3 г", caffeine: "27 мг", taurine: "120 мг", vitamins: "B3, B5, B6, C",
+            comp: "Вода питьевая очищенная, сахар, регулятор кислотности лимонная кислота, таурин, кофеин, сок из черной моркови, витамины (ниацин, пантотеновая кислота, B6, C), консервант бензоат натрия."
+        },
+        {
+            code: "c2", name: "Flash Donut", img: "flash_donut.jpg", price: 90, isZero: false, isEnergy: true, category: "flash",
+            slogan: "⚡ FLASH UP • Сладкий кураж • Пончик и Глазурь",
+            desc: "Лимитированный десертный Flash Up со вкусом сладкого пончика и глазури.",
+            cal: "46 ккал / 195 кДж", carbs: "11.5 г", caffeine: "27 мг", taurine: "120 мг", vitamins: "B3, B5, B6, C",
+            comp: "Вода питьевая, сахар, лимонная кислота, таурин, кофеин, ароматизатор пищевой 'Пончик', краситель сахарный колер IV, витамины B3, B5, B6, C."
+        },
+        {
+            code: "c3", name: "Flash Game", img: "flash_game.jpg", price: 90, isZero: false, isEnergy: true, category: "flash",
+            slogan: "⚡ FLASH UP GAME • Заряжайся для победы в каткаx",
+            desc: "Геймерский Flash Up со вкусом экзотической гуараны и лайма.",
+            cal: "45 ккал / 190 кДж", carbs: "11.2 г", caffeine: "28 мг", taurine: "120 мг", vitamins: "B3, B5, B6, C",
+            comp: "Вода, сахар, лимонная кислота, таурин, экстракт гуараны, кофеин натуральный, цитрат натрия, витаминный комплекс (B3, B5, B6, C)."
+        },
+        {
+            code: "c4", name: "Flash Kiwi", img: "flash_kiwi.jpg", price: 90, isZero: false, isEnergy: true, category: "flash",
+            slogan: "⚡ FLASH UP • Сочный Киви • Заряд свежести",
+            desc: "Освежающий кисленький вкус сочного фрукта киви.",
+            cal: "44 ккал / 185 кДж", carbs: "11.0 г", caffeine: "27 мг", taurine: "120 мг", vitamins: "B3, B5, B6, C",
+            comp: "Вода, сахар, лимонная кислота, таурин, кофеин, сок киви концентрированный, цитрат натрия, краситель медные комплексы хлорофиллов."
+        },
+        {
+            code: "c5", name: "Flash Lime", img: "flash_lime.jpg", price: 90, isZero: false, isEnergy: true, category: "flash",
+            slogan: "⚡ FLASH UP • Ледяной Лайм • Включай свежесть",
+            desc: "Ледяной цитрусовый Flash Up со вкусом спелого лайма.",
+            cal: "44 ккал / 185 кДж", carbs: "11.0 г", caffeine: "27 мг", taurine: "120 мг", vitamins: "B3, B5, B6, C",
+            comp: "Вода очищенная, сахар, лимонная кислота, таурин, кофеин, сок лайма, натрия цитрат, натуральные ароматизаторы, витамины."
+        },
+        {
+            code: "c6", name: "Flash Orange", img: "flash_orange.jpg", price: 90, isZero: false, isEnergy: true, category: "flash",
+            slogan: "⚡ FLASH UP • Апельсиновый драйв",
+            desc: "Яркий апельсиновый энергетик со свежим соком.",
+            cal: "45 ккал / 190 кДж", carbs: "11.2 г", caffeine: "27 мг", taurine: "120 мг", vitamins: "B3, B5, B6, C",
+            comp: "Вода, сахар, апельсиновый сок концентрированный, лимонная кислота, таурин, кофеин, бета-каротин, витамины."
+        },
+        {
+            code: "c7", name: "Flash Original", img: "flash_original.jpg", price: 90, isZero: false, isEnergy: true, category: "flash",
+            slogan: "⚡ FLASH UP ENERGY • Твой энергичный ритм дня",
+            desc: "Классический оригинальный Flash Up Energy с узнаваемой бодрящей кислинкой.",
+            cal: "45 ккал / 190 кДж", carbs: "11.3 г", caffeine: "27 мг", taurine: "120 мг", vitamins: "B3, B5, B6, C",
+            comp: "Вода питьевая очищенная, сахар, лимонная кислота, таурин, кофеин, цитрат натрия, витамины B3, B5, B6, C, консервант бензоат натрия."
+        },
+        {
+            code: "c8", name: "Flash Ultra", img: "flash_ultra.jpg", price: 90, isZero: false, isEnergy: true, category: "flash",
+            slogan: "⚡ FLASH UP ULTRA • Максимальная концентрация энергии",
+            desc: "Усиленный Flash Up с добавлением экстракта гуараны.",
+            cal: "48 ккал / 200 кДж", carbs: "11.8 г", caffeine: "30 мг", taurine: "200 мг", vitamins: "B3, B5, B6, C",
+            comp: "Вода, сахар, лимонная кислота, таурин усиленный, кофеин натуральный, экстракт гуараны, витаминный комплекс, натрия цитрат."
+        },
+        {
+            code: "c9", name: "Flash Zero", img: "flash_zero.jpg", price: 90, isZero: true, isEnergy: true, category: "flash",
+            slogan: "🌱 FLASH ZERO • 100% энергии • Без сахара",
+            desc: "Flash Up БЕЗ САХАРА И КАЛОРИЙ. Безалкогольный тонизирующий напиток.",
+            cal: "0 ккал / 0 кДж", carbs: "Не содержит углеводов", caffeine: "27 мг", taurine: "120 мг", vitamins: "B3, B5, B6, C",
+            comp: "Вода питьевая очищенная, регуляторы кислотности (лимонная кислота, цитрат натрия), таурин, кофеин натуральный, подсластители (сукралоза, цикламат натрия), витаминный микс."
+        },
+        {
+            code: "r1", name: "Raush", img: "raush.jpg", price: 50, isZero: true, isEnergy: false, category: "lemonade",
+            slogan: "🥤 RAUSH 1.4L • Освежающий лимонад для всей семьи",
+            desc: "Большая бутылка 1.4 литра прохладительного освежающего лимонада. Отличный вкус для праздников и встреч с друзьями!",
+            cal: "0 ккал / 0 кДж", carbs: "Не содержит углеводов", caffeine: "Отсутствует", taurine: "Отсутствует", vitamins: "B3, B6",
+            comp: "Вода питьевая подготовленная газированная, регуляторы кислотности (лимонная кислота, цитрат натрия 3-замещенный), ароматизатор пищевой лимонад, подсластители, консерванты (бензоат натрия, сорбат калия)."
+        }
     ];
 
     let cart = [];
     let selectedDelivery = 'fast'; 
     let isPromoApplied = false;
     let toastTimeout, barTimeout;
+    let activeCategory = 'all';
 
-    // ПРОВЕРКА РАБОЧЕГО ВРЕМЕНИ (13:00 - 20:00)
+    // РАБОЧЕЕ ВРЕМЯ
     function isWorkingHours() {
         const now = new Date();
         const hours = now.getHours();
@@ -399,33 +746,101 @@
         }
     }
 
-    // Инициализация при загрузке
+    setInterval(updateHeaderStatus, 10000);
     updateHeaderStatus();
 
-    const grid = document.getElementById('productGrid');
+    // РЕНДЕР И ФИЛЬТРАЦИЯ
+    function renderProducts() {
+        const grid = document.getElementById('productGrid');
+        grid.innerHTML = '';
 
-    // Отрисовка витрины
-    products.forEach(p => {
-        const card = document.createElement('div');
-        card.className = 'card';
-        card.innerHTML = `
-            <div class="product-code">${p.code}</div>
-            <img src="images/${p.img}" alt="${p.name}" onerror="this.src='https://via.placeholder.com/150/0d0d0d/ff0000?text=NineGo'">
-            <p class="card-title">${p.name}</p>
-            <p class="price">${p.price} руб</p>
-        `;
-        const btn = document.createElement('button');
-        btn.className = 'buy-btn';
-        btn.innerText = 'Купить';
-        btn.onclick = (e) => { e.stopPropagation(); addToCart(p.name, p.price, p.code); };
-        card.appendChild(btn);
-        grid.appendChild(card);
-    });
+        const searchQuery = document.getElementById('searchInput').value.trim().toLowerCase();
 
-    function addToCart(name, price, code) {
-        cart.push({name, price, code});
-        document.getElementById('cart-count').innerText = cart.length;
-        showToast(name);
+        const filtered = products.filter(p => {
+            const matchesSearch = p.name.toLowerCase().includes(searchQuery) || p.code.toLowerCase().includes(searchQuery);
+            let matchesCat = true;
+
+            if (activeCategory === 'zero') matchesCat = p.isZero;
+            else if (activeCategory !== 'all') matchesCat = p.category === activeCategory;
+
+            return matchesSearch && matchesCat;
+        });
+
+        if (filtered.length === 0) {
+            grid.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding:40px 0; color:#666;">Ничего не найдено</div>`;
+            return;
+        }
+
+        filtered.forEach(p => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.onclick = () => openProductDetail(p.code);
+            card.innerHTML = `
+                <div class="product-code">${p.code}</div>
+                <img src="images/${p.img}" alt="${p.name}" onerror="this.src='https://via.placeholder.com/150/0d0d0d/ff0000?text=NineGo'">
+                <p class="card-title">${p.name}</p>
+                <p class="price">${p.price} руб</p>
+            `;
+            const btn = document.createElement('button');
+            btn.className = 'buy-btn';
+            btn.innerText = 'Купить';
+            btn.onclick = (e) => { 
+                e.stopPropagation(); 
+                addToCart(p.code); 
+            };
+            card.appendChild(btn);
+            grid.appendChild(card);
+        });
+    }
+
+    function selectCategory(cat, el) {
+        playClickSound();
+        activeCategory = cat;
+        document.querySelectorAll('.cat-chip').forEach(c => c.classList.remove('active'));
+        el.classList.add('active');
+        renderProducts();
+    }
+
+    function filterProducts() {
+        renderProducts();
+    }
+
+    renderProducts();
+
+    // КОРЗИНА И РАБОТА С КОЛИЧЕСТВОМ
+    function addToCart(code) {
+        playClickSound();
+        const product = products.find(p => p.code === code);
+        if (!product) return;
+
+        const existing = cart.find(item => item.code === code);
+        if (existing) {
+            existing.qty += 1;
+        } else {
+            cart.push({ ...product, qty: 1 });
+        }
+
+        updateCartBadge();
+        showToast(product.name);
+    }
+
+    function changeQty(code, delta) {
+        playClickSound();
+        const item = cart.find(i => i.code === code);
+        if (!item) return;
+
+        item.qty += delta;
+        if (item.qty <= 0) {
+            cart = cart.filter(i => i.code !== code);
+        }
+
+        updateCartBadge();
+        openCart(); // Перерисовать открытую корзину
+    }
+
+    function updateCartBadge() {
+        const totalCount = cart.reduce((sum, item) => sum + item.qty, 0);
+        document.getElementById('cart-count').innerText = totalCount;
     }
 
     function showToast(name) {
@@ -454,6 +869,7 @@
     }
 
     function selectDelivery(type) {
+        playClickSound();
         selectedDelivery = type;
         document.getElementById('delivery-fast').classList.toggle('active', type === 'fast');
         document.getElementById('delivery-std').classList.toggle('active', type === 'std');
@@ -461,6 +877,7 @@
     }
 
     function applyPromo() {
+        playClickSound();
         const code = document.getElementById('promoInput').value.trim();
         const status = document.getElementById('promoStatus');
 
@@ -479,7 +896,7 @@
     }
 
     function calculateTotal() {
-        let itemsSum = cart.reduce((a, b) => a + b.price, 0);
+        let itemsSum = cart.reduce((a, b) => a + (b.price * b.qty), 0);
         let deliveryCost = 0;
 
         if (selectedDelivery === 'fast') {
@@ -491,17 +908,6 @@
         document.getElementById('totalSum').innerText = itemsSum + deliveryCost;
     }
 
-    function getGroupedCart() {
-        const counts = {};
-        cart.forEach(item => {
-            if (!counts[item.code]) {
-                counts[item.code] = { ...item, qty: 0 };
-            }
-            counts[item.code].qty += 1;
-        });
-        return Object.values(counts);
-    }
-
     function openCart() {
         const container = document.getElementById('cartItems');
         const footer = document.getElementById('cartFooter');
@@ -510,13 +916,16 @@
             container.innerHTML = "<p style='text-align:center; color:#555; padding:30px 0;'>Корзина пуста</p>";
             footer.style.display = 'none';
         } else {
-            const grouped = getGroupedCart();
-            container.innerHTML = grouped.map(item => `
+            container.innerHTML = cart.map(item => `
                 <div class="cart-item">
-                    <div>
+                    <div class="cart-item-info">
                         <span class="cart-item-title">${item.name}</span>
-                        <span class="cart-item-code">[${item.code}]</span>
-                        ${item.qty > 1 ? `<span class="cart-item-qty">x${item.qty}</span>` : ''}
+                        <span class="cart-item-code">[${item.code.toUpperCase()}]</span>
+                    </div>
+                    <div class="cart-controls">
+                        <button class="qty-btn" onclick="changeQty('${item.code}', -1)">−</button>
+                        <span class="qty-val">${item.qty}</span>
+                        <button class="qty-btn" onclick="changeQty('${item.code}', 1)">+</button>
                     </div>
                     <span class="cart-item-price">${item.price * item.qty} руб</span>
                 </div>
@@ -527,6 +936,47 @@
         }
         
         openModal('cartModal');
+    }
+
+    // ОТКРЫТИЕ ДЕТАЛЕЙ ТОВАРА
+    function openProductDetail(code) {
+        playClickSound();
+        const p = products.find(prod => prod.code === code);
+        if (!p) return;
+
+        document.getElementById('detailCode').innerText = `КОД: ${p.code.toUpperCase()}`;
+        document.getElementById('detailImg').src = `images/${p.img}`;
+        document.getElementById('detailTitle').innerText = p.name;
+        document.getElementById('detailPrice').innerText = `${p.price} руб`;
+        document.getElementById('detailSlogan').innerText = p.slogan;
+        document.getElementById('detailDesc').innerText = p.desc;
+
+        const sugarTag = document.getElementById('detailSugarTag');
+        if (p.isZero) {
+            sugarTag.className = 'sugar-tag zero';
+            sugarTag.innerText = '🌱 НЕ СОДЕРЖИТ САХАРА И УГЛЕВОДОВ';
+        } else {
+            sugarTag.className = 'sugar-tag contains';
+            sugarTag.innerText = '⚡ СОДЕРЖИТ САХАР И УГЛЕВОДЫ';
+        }
+
+        const warnBox = document.getElementById('energyWarning');
+        warnBox.style.display = p.isEnergy ? 'block' : 'none';
+
+        document.getElementById('nutrCal').innerText = p.cal;
+        document.getElementById('nutrCarbs').innerText = p.carbs;
+        document.getElementById('nutrCaffeine').innerText = p.caffeine;
+        document.getElementById('nutrTaurine').innerText = p.taurine;
+        document.getElementById('nutrVitamins').innerText = p.vitamins;
+        document.getElementById('detailComposition').innerText = p.comp;
+
+        const addBtn = document.getElementById('detailAddBtn');
+        addBtn.onclick = () => {
+            addToCart(p.code);
+            closeModal('productDetailModal');
+        };
+
+        openModal('productDetailModal');
     }
 
     function openModal(id) {
@@ -545,11 +995,11 @@
 
     function closeAllModals() {
         closeModal('cartModal');
+        closeModal('productDetailModal');
         closeModal('successModal');
         closeModal('errorModal');
     }
 
-    // ЛОГИКА ОФОРМЛЕНИЯ ЗАКАЗА С ПРОВЕРКОЙ ВРЕМЕНИ
     function handleCheckout() {
         closeModal('cartModal');
 
@@ -563,19 +1013,34 @@
     }
 
     function showSuccess() {
-        const grouped = getGroupedCart();
-        const formattedCode = grouped.map(item => {
+        playClickSound();
+        const address = document.getElementById('deliveryAddress').value.trim();
+        const comment = document.getElementById('orderComment').value.trim();
+
+        // Генерация кода заказа
+        const formattedCode = cart.map(item => {
             const codeUpper = item.code.toUpperCase();
             return item.qty > 1 ? `${codeUpper}(x${item.qty})` : codeUpper;
         }).join('-');
 
-        document.getElementById('generatedOrderCode').innerText = formattedCode || "EMPTY";
+        let finalOrderText = formattedCode || "EMPTY";
+        if (address) {
+            finalOrderText += ` | АДРЕС: ${address}`;
+        }
+        if (comment) {
+            finalOrderText += ` (${comment})`;
+        }
+
+        document.getElementById('generatedOrderCode').innerText = finalOrderText;
         openModal('successModal');
     }
 
     function resetApp() {
+        playClickSound();
         cart = [];
-        document.getElementById('cart-count').innerText = '0';
+        document.getElementById('deliveryAddress').value = '';
+        document.getElementById('orderComment').value = '';
+        updateCartBadge();
         closeAllModals();
     }
 </script>
